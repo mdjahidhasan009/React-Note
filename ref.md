@@ -89,7 +89,7 @@
 
       export default RefsMistake;
     ```
-    Recommended Approach
+    Recommended Approach is to use React's state to show/hide the form. This ensures that React keeps track of all DOM changes, preventing memory leaks and maintaining consistency.
 
     ```jsx
       import { useState, useRef, useEffect } from "react";
