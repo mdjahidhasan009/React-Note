@@ -206,7 +206,7 @@ export default GoodbyeForwardRef;
     <summary>2. Component name is not displayed in the dev tools</summary>
 
 In the below example, the component name is not displayed in the dev tools. It will be displayed as anonymous. </br>
-<img src="./images/forwardRef/anonymous.png">
+<img src="../images/forwardRef/anonymous.png">
 ```jsx
     import { useRef, forwardRef } from "react";
     
@@ -231,7 +231,7 @@ In the below example, the component name is not displayed in the dev tools. It w
     export default GoodbyeForwardRef;
 ```
 We need to pass the name of the function to the forwardRef to display the name in the dev tools. </br>
-<img src="./images/forwardRef/named.png">
+<img src="../images/forwardRef/named.png">
 ```jsx
     import { useRef, forwardRef } from "react";
     
@@ -365,7 +365,7 @@ But there can be multiple input elements in the form. So we in which input eleme
     <summary>5. Complicated typescript types</summary>
 
 In this example we can use person type at GoodbyeForwardRef. And typescript will work at the GoodbyeForwardRef. Also on hover it will show as Person type.
-<img src="./images/forwardRef/onHover.png">
+<img src="../images/forwardRef/onHover.png">
 ```jsx
     // ⚠️ TypeScript Issues - generics
     function ItemsTable<T>({
@@ -414,7 +414,7 @@ In this example we can use person type at GoodbyeForwardRef. And typescript will
     export default GoodbyeForwardRef;
 ```
 But we use forwardRef then type person will not work on GoodbyeForwardRef. Both items and item will be type unknown.
-<img src="./images/forwardRef/items_unknown.png"> <img src="./images/forwardRef/item_unknown.png">
+<img src="../images/forwardRef/items_unknown.png"> <img src="../images/forwardRef/item_unknown.png">
 
 ```jsx
     import { useRef, forwardRef } from "react";
