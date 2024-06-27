@@ -1,6 +1,6 @@
 # Will add those blog
-* [TypeScript + React: Typing Generic forwardRefs](https://fettblog.eu/typescript-react-generic-forward-refs/) 
-at [forwardRef > 5. Complecated typescript types](ref/forwardRef.md)
+* [TypeScript + React: Typing Generic forwardRefs](https://fettblog.eu/typescript-react-generic-forward-refs/)
+  at [forwardRef > 5. Complecated typescript types](ref/forwardRef.md)
 * [React ref Callback Use Cases](https://julesblom.com/writing/ref-callback-use-cases#user-content-fn-refescapehatch)
 
 
@@ -21,14 +21,15 @@ at [forwardRef > 5. Complecated typescript types](ref/forwardRef.md)
 * [Speed/cost of localStorage](https://stackoverflow.com/questions/8074218/speed-cost-of-localstorage)
 * [feat(query-devtools): Add picture-in-picture mode](https://github.com/TanStack/query/pull/6931)
 
+* [3 ways to autofocus an input in React that ALMOST always work!](https://blog.maisie.ink/react-ref-autofocus/)
+* [So you think you know everything about React refs](https://thoughtspile.github.io/2021/05/17/everything-about-react-refs/)
+*
 
 # Blog/Article/Youtube
 * [overreacted by Dan Abramov](https://overreacted.io/)
-* [Kent C. Dodds](https://kentcdodds.com/)
+* [Kent C. Dodds](https://kentcdodds.com/blog)
 * [React Bits](https://vasanthk.gitbooks.io/react-bits/)
-* [TkDodo's blog](https://tkdodo.eu/blog/)
 * [React Patterns](https://reactpatterns.com/)
 * [Fettblog](https://fettblog.eu/)
 * [Jules Blom](https://julesblom.com/)
 * [Profy dev](https://www.youtube.com/@profydev)
-* [Lydia Hallie](https://www.lydiahallie.com/)
