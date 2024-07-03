@@ -43,12 +43,15 @@ const submit = useMemo(() => {
 }, []);
 ```
 
-# `React.memo`
-`React.memo` is a higher order component that memoizes the component. It's similar to `PureComponent` but for functional
-components. It's used to prevent unnecessary re-renders of a component by memoizing the component's props. When the parent
-component re-renders, `React.memo` will compare the previous and current props. If the props have not changed, the component
-will not re-render also the component under it will not re-render. **It's similar to `shouldComponentUpdate` in class 
-components.**
+
+# React.memo
+`React.memo` is a higher-order component that memorizes the component. It's similar to `PureComponent` but for functional
+components. It's used to prevent unnecessary re-renders of a component by memorizing the component's props. When the 
+parent component re-renders, `React.memo` will compare the previous and current props. If the props have not changed, 
+the component will not re-render. Similarly, the component under it will not re-render. **It's similar to 
+`shouldComponentUpdate` in class components.**
+
+## Basic Usage
 
 ```jsx
 const MyComponent = React.memo(function MyComponent(props) {
@@ -56,43 +59,184 @@ const MyComponent = React.memo(function MyComponent(props) {
 });
 ``` 
 
-But in this case
+## Common Pitfall
+
+In this example, `React.memo` will not prevent the re-render of `MyComponent`.
+
 ```jsx
 const Child = ({ data, onChange }) => {};
 const ChildMemo = React.memo(Child);
 
 const Component = () => {
     // object and function declared inline
+    const data = {....}
+    const onChange = () => {...}
+    
     // will change with every re-render
-    return <ChildMemo data={{ ...some_object }} onChange={() =>
-    {...}} />
+    return <ChildMemo data={data} onChange={onChange} />
 }
 ```
-In this case, `ChildMemo` will re-render at every render as the object and function declared inline will be created at every
-render. So, it will be a new reference at every render. Here `useMemo` and `useCallback` will be useful.
+
+### Explanation
+
+In this case, `ChildMemo` will re-render at every render as the `data` object and `onChange` function declared inline
+will be created at every render. So, it will be a new reference at every render. That's why `ChildMemo` will get new 
+reference at every re-render and the `ChlidMemo` will be rerender every time.
+
+## Solution
+
+We can fix this issue using `useMemo` and `useCallback`.
+
 ```jsx
 const Child = ({ data, onChange }) => {};
 const ChildMemo = React.memo(Child);
 
 const Component = () => {
-    const data = useMemo(() => ({ ... }), []); // some object
-    const onChange = useCallback(() => {}, []); // some callback
     // data and onChange now have stable reference
+    const data = useMemo(() => ({ ...some_object }), []); // some object
+    const onChange = useCallback(() => {}, []); // some callback
+
     // re-renders of ChildMemo will be prevented
     return <ChildMemo data={data} onChange={onChange} />
 }
 ```
-By using `useMemo` and `useCallback` we can prevent unnecessary re-renders of `ChildMemo` component.
 
-## `useMemo` vs `useCallback`
+### Explanation
+
+By using `useMemo` and `useCallback`, we can prevent unnecessary re-renders of the `ChildMemo` component.
+
+* `useMemo` - Returns a memoized value. It only recalculates the value when one of the dependencies has changed. This
+  helps to keep the reference of the object stable.
+* `useCallback` - Returns a memoized callback. It only changes if one of the dependencies has changed. This helps to 
+  keep the reference of the function stable.
+
+## Summary
+
+- `React.memo` is used to memorize functional components.
+- It prevents unnecessary re-renders by comparing previous and current props.
+- Be cautious with inline object and function declarations as they create new references on each render.
+- Use `useMemo` and `useCallback` to keep references stable and prevent unnecessary re-renders.
+
+## React.memo and props from props
+`React.memo` is a higher-order component that memorizes the component. It's similar to `PureComponent` but for 
+functional components. It's used to prevent unnecessary re-renders of a component by memorizing the component's props. 
+However, there are certain nuances and pitfalls in using `React.memo` effectively.
+
+In this example, `React.memo` will not prevent the re-render of `ChildMemo`:
+
+```jsx
+const Child = ({ data, onChange }) => {};
+const ChildMemo = React.memo(Child);
+
+const Component = (props) => {
+  return <ChildMemo {...props} />;
+};
+
+const ComponentInBetween = (props) => {
+  return <Component {...props} />;
+};
+
+const InitialComponent = (props) => {
+  // this one will have state and will trigger re-render of Component
+  return (
+    <ComponentInBetween {...props} data={{ id: '1' }} />
+  );
+};
+```
+
+In this case, the `InitialComponent` breaks the memoization of the `ChildMemo` component since it passes a non-memoized `data` prop to it. This is especially problematic when dealing with deeply nested components spread across different files.
+
+### Rules for Effective Usage of React.memo
+
+#### Rule 1: Never spread props coming from other components
+
+Instead of this:
+
+```jsx
+const Component = (props) => {
+  return <ChildMemo {...props} />;
+};
+```
+
+Use explicit props like this:
+
+```jsx
+const Component = (props) => {
+  return <ChildMemo some={props.some} other={props.other} />;
+};
+```
+
+#### Rule 2: Avoid passing non-primitive props from other components
+
+Even with explicit props, memoization will break if any of those props are non-memoized objects or functions. Those will
+break memoization and cause unnecessary re-renders.
+
+```jsx
+const Component = (props) => {
+  return <ChildMemo some={props.some} other={props.other} />;
+};
+```
+Instead, memoize the non-primitive props:
+
+```jsx
+const Component = (props) => {
+  const some = useMemo(() => props.some, [props.some]);
+  const other = useMemo(() => props.other, [props.other]);
+  return <ChildMemo some={some} other={other} />;
+};
+```
+
+#### Rule 3: Avoid passing non-primitive values from custom hooks
+
+Custom hooks are convenient but can hide whether data or functions have stable references.
+
+Consider this:
+
+```jsx
+const Component = () => {
+  const { submit } = useForm();
+  return <ChildMemo onChange={submit} />;
+};
+```
+
+The `submit` function is hidden in the `useForm` custom hook and might break memoization.
+
+Example `useForm` hook:
+
+```jsx
+const useForm = () => {
+  // lots and lots of code to control the form state
+  const submit = () => {
+    // do something on submit, like data validation
+  };
+  return {
+    submit,
+  };
+};
+```
+
+By passing the `submit` function to `ChildMemo`, its memoization is broken.
+
+### Summary
+
+- `React.memo` is used to memorize functional components.
+- It prevents unnecessary re-renders by comparing previous and current props.
+- Follow these rules to ensure effective memoization:
+    - Never spread props from other components.
+    - Avoid passing non-primitive props from other components.
+    - Avoid passing non-primitive values from custom hooks.
+
+
+
+# `useMemo` vs `useCallback`
 * `useMemo` is used to memoize the **value** and `useCallback` is used to memoize the **function**.
 * `useCallback` re-creates the **function** passed to it with each render, while `useMemo` only re-creates the **value** 
    returned by the function passed to it when its dependencies change.
 
 Sometime people think `useMemo` is better than `useCallback` as `useCallback` re-create the function at every render and
-`useMemo` only re-create the value when dependency changes. But, it's not true. `useCallback` is used to memoize the function
-and `useMemo` is used to memoize the value. So, it's better to use `useCallback` when we need to memoize the function and
-`useMemo` when we need to memoize the value.
+`useMemo` only re-create the value when dependency changes. But, it's not true. `useCallback` is used to memoize the 
+function and `useMemo` is used to memoize the value. So, it's better to use `useCallback` when we need to memoize the 
+function and `useMemo` when we need to memoize the value.
 
 The only time that I can think of where it would actually matter, in theory, is when we pass as the first argument not 
 the function itself, but a result of another function execution hardcoded inline. Basically this:
@@ -107,11 +251,15 @@ avoid this kind of code. We should always pass the function itself to `useCallba
 ## When Should We Memoize?
 ### When a prop is used as a dependency in another hook downstream component
 
-Memoization can be crucial in optimizing performance and preventing unnecessary re-renders in React components. Here’s an example of when and how to use memoization in a React component when a prop is used as a dependency in another hook in a downstream component.
+Memoization can be crucial in optimizing performance and preventing unnecessary re-renders in React components. Here’s 
+an example of when and how to use memoization in a React component when a prop is used as a dependency in another hook 
+in a downstream component.
 
 ### Example
 
-Let's say we have a parent component `ParentComponent` that passes a prop to a child component `ChildComponent`. The child component uses this prop in a `useEffect` hook. We can use `useMemo` in the parent component to ensure that the prop is only re-computed when necessary.
+Let's say we have a parent component `ParentComponent` that passes a prop to a child component `ChildComponent`. The 
+child component uses this prop in a `useEffect` hook. We can use `useMemo` in the parent component to ensure that the
+prop is only re-computed when necessary.
 
 ```jsx
 import React, { useState, useMemo, useEffect } from 'react';
@@ -160,7 +308,8 @@ export default ParentComponent;
 - **Performance**: Reduces unnecessary re-renders and computations, improving performance.
 - **Stability**: Ensures that downstream hooks and components only react to genuine changes in dependencies.
 
-By memoizing the prop, we ensure that `ChildComponent`'s `useEffect` hook only runs when necessary, thus optimizing the component's performance.
+By memorizing the prop, we ensure that `ChildComponent`'s `useEffect` hook only runs when necessary, thus optimizing the
+component's performance.
 
 
 
