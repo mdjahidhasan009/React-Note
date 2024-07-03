@@ -44,11 +44,12 @@ const submit = useMemo(() => {
 ```
 
 
+
 # React.memo
-`React.memo` is a higher-order component that memorizes the component. It's similar to `PureComponent` but for functional
-components. It's used to prevent unnecessary re-renders of a component by memorizing the component's props. When the 
-parent component re-renders, `React.memo` will compare the previous and current props. If the props have not changed, 
-the component will not re-render. Similarly, the component under it will not re-render. **It's similar to 
+`React.memo` is a higher-order component that memorizes the component. It's similar to `PureComponent` but for 
+functional components. It's used to prevent unnecessary re-renders of a component by memorizing the component's props. 
+When the parent component re-renders, `React.memo` will compare the previous and current props. If the props have not 
+changed, the component will not re-render. Similarly, the component under it will not re-render. **It's similar to 
 `shouldComponentUpdate` in class components.**
 
 ## Basic Usage
@@ -79,9 +80,7 @@ const Component = () => {
 
 ### Explanation
 
-In this case, `ChildMemo` will re-render at every render as the `data` object and `onChange` function declared inline
-will be created at every render. So, it will be a new reference at every render. That's why `ChildMemo` will get new 
-reference at every re-render and the `ChlidMemo` will be rerender every time.
+In this case, `ChildMemo` will re-render at every render as the `data` object and `onChange` function declared inline will be created at every render. So, it will be a new reference at every render. That's why `ChildMemo` will get a new reference at every re-render and the `ChildMemo` will re-render every time.
 
 ## Solution
 
@@ -105,10 +104,8 @@ const Component = () => {
 
 By using `useMemo` and `useCallback`, we can prevent unnecessary re-renders of the `ChildMemo` component.
 
-* `useMemo` - Returns a memoized value. It only recalculates the value when one of the dependencies has changed. This
-  helps to keep the reference of the object stable.
-* `useCallback` - Returns a memoized callback. It only changes if one of the dependencies has changed. This helps to 
-  keep the reference of the function stable.
+* `useMemo` - Returns a memoized value. It only recalculates the value when one of the dependencies has changed. This helps to keep the reference of the object stable.
+* `useCallback` - Returns a memoized callback. It only changes if one of the dependencies has changed. This helps to keep the reference of the function stable.
 
 ## Summary
 
@@ -117,10 +114,8 @@ By using `useMemo` and `useCallback`, we can prevent unnecessary re-renders of t
 - Be cautious with inline object and function declarations as they create new references on each render.
 - Use `useMemo` and `useCallback` to keep references stable and prevent unnecessary re-renders.
 
-## React.memo and props from props
-`React.memo` is a higher-order component that memorizes the component. It's similar to `PureComponent` but for 
-functional components. It's used to prevent unnecessary re-renders of a component by memorizing the component's props. 
-However, there are certain nuances and pitfalls in using `React.memo` effectively.
+## React.memo and Props from Other Components
+`React.memo` is a higher-order component that memorizes the component. It's similar to `PureComponent` but for functional components. It's used to prevent unnecessary re-renders of a component by memorizing the component's props. However, there are certain nuances and pitfalls in using `React.memo` effectively.
 
 In this example, `React.memo` will not prevent the re-render of `ChildMemo`:
 
@@ -227,6 +222,123 @@ By passing the `submit` function to `ChildMemo`, its memoization is broken.
     - Avoid passing non-primitive values from custom hooks.
 
 
+## React.memo and Children
+Elements and children as props can also affect memoization. Consider this:
+```jsx
+const ChildMemo = React.memo(Child);
+
+const Component = () => {
+    return (
+        <ChildMemo>
+            <div>Some text here</div>
+        </ChildMemo>
+    );
+};
+```
+Which is equivalent to:
+```jsx
+const Component = () => {
+  return <ChildMemo children={<div>Some text here</div>} />;
+};
+```
+
+This can be rewritten using `React.createElement` 
+```js
+const Component = () => {
+  return React.createElement(ChildMemo, { children: React.createElement('div', null, 'Some text here') });
+};
+```
+But at every re-render `childMomo` will be created as a new reference. So, it will re-render at every render. To prevent
+this we can use `useMemo` or `useCallback` to memoize the children.
+
+```jsx
+
+const Component = () => {
+  const content = useMemo(() => <div>Some text here</div>, []);
+  return <ChildMemo children={content} />;
+};
+```
+
+Or using the more familiar syntax:
+
+```jsx
+const Component = () => {
+  const content = useMemo(
+      () => <div>Some text here</div>, 
+      []
+  );
+  
+  return <ChildMemo>{content}</ChildMemo>;
+};
+```
+
+Same thing will happen with children as a render props like this:
+```jsx
+const Component = () => {
+    return (
+        <ChildMemo>{() => <div>Some text here</div>}</ChildMemo>
+    );
+};
+```
+Our children here is a function that is re-created on every re-render. Also need to memoize it with `useMemo`:
+```jsx
+const Component = () => {
+
+    const content = useMemo(
+        () => () => <div>Some text here</div>, 
+        [],
+    );
+    
+    return <ChildMemo>{content}</ChildMemo>;
+};
+```
+
+Or just use `useCallback` :
+```jsx
+const Component = () => {
+    const content = useCallback(
+        () => <div>Some text here</div>,
+        [],
+    );
+    
+    return <ChildMemo>{content}</ChildMemo>;
+};
+```
+
+## React.memo and Nested Memoized Components
+
+Even with nested memoized components, issues can arise:
+
+```jsx
+const ChildMemo = React.memo(Child);
+const ParentMemo = React.memo(Parent);
+
+const Component = () => {
+  return (
+    <ParentMemo>
+      <ChildMemo />
+    </ParentMemo>
+  );
+};
+```
+This will not prevent re-renders of `ParentMemo` because at every rerender `ChildMemo` and `ParentMemo` will be created 
+with a new reference. So, it will re-render at every render. To prevent this we need to memoize the child element.
+
+```jsx
+const Component = () => {
+  const child = useMemo(() => <ChildMemo />, []);
+  return <ParentMemo>{child}</ParentMemo>;
+};
+```
+
+## Summary
+
+- `React.memo` is used to memorize functional components.
+- It prevents unnecessary re-renders by comparing previous and current props.
+- Be cautious with inline object and function declarations as they create new references on each render.
+- Use `useMemo` and `useCallback` to keep references stable and prevent unnecessary re-renders.
+- Memoize elements and children props to ensure effective memoization.
+- Be mindful of nested memoized components and ensure their children are also memoized.
 
 # `useMemo` vs `useCallback`
 * `useMemo` is used to memoize the **value** and `useCallback` is used to memoize the **function**.
@@ -341,3 +453,29 @@ const Component = () => {
 ```
 In this case, `onClick` is not dependent on any props or state. So, we don't need to memoize it. It's better to use it
 
+
+#### Expensive computation in `useMemo`
+Sorting an array of 300 items on pc, even with a 6x slowed-down CPU, takes less than 2ms. But on some old Android 2 mobile phone, it
+might take a second.
+
+Executing a regular expression on a text that takes 100ms feels slow. But on a 1000-word article, it's acceptable.
+
+
+
+#### Summary 
+* React compares objects/arrays/functions by their reference, not their value. That comparison happens in hooks' 
+  dependencies and in props of components wrapped in `React.memo`.
+* The inline function passed as an argument to either `useMemo` or `useCallback` will be re-created on every re-render. 
+  `useCallback` memorizes that function itself, `useMemo` memorizes the result of its execution.
+* Memorizing props on a component makes sense only when:
+    * This component is wrapped in `React.memo`.
+    * This component uses those props as dependencies in any of the hooks.
+    * This component passes those props down to other components, and they have either of the situations from above
+* If a component is wrapped in `React.memo` and its re-render is triggered by its parent, then React will not re-render 
+  this component if its props haven't changed. In any other case, rerender will proceed as usual.
+* Memorizing all props on a component wrapped in `React.memo` is harder than it seems. Avoid passing non-primitive values
+  that are coming from other props or hooks to it.
+* When memorizing props, remember that "children" is also a non-primitive prop that needs to be memoized.
+
+#### Source:
+* [Advanced React](https://www.advanced-react.com/)
