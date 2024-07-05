@@ -26,26 +26,6 @@ The fiber work loop is the process by which the reconciler updates the UI in res
 # Fiber Commit Phase
 The fiber commit phase is the final phase of the reconciliation process. In this phase, the reconciler applies the changes to the DOM and updates the UI to reflect the changes in the application state. The commit phase is designed to be efficient and performant, so that updates to the UI can be made quickly and without unnecessary re-renders.
 
-
-
-
-
-
-
-
-
-React does `Object.is(ElementBeforeRender, ElementAfterRender)` to determine if the element has changed. If it has 
-changed(means `false`), React will update the element in the DOM. If it hasn't changed(means `true`), React will not 
-update the element in the DOM. React do not compare the children of the element. React will update the children of the 
-element if the parent element has changed. React will not update the children of the element if the parent element has 
-not changed. Also, React done shallow comparison not deep comparison.
-
-When the comparison return `false`, first it will check type
-* **Same Type:** Will re-render the component so the state will be preserved.
-* **Different Type:** Will unmount the old component and mount the new component in the DOM so old state will be lost.
-  and the new component will be mounted in the DOM.
-
-
 # Fiber Reconciliation Phases
 The fiber reconciliation process is divided into several phases, each of which performs a specific task in the reconciliation process. The phases are:
 
@@ -63,6 +43,17 @@ The fiber reconciliation process is divided into several phases, each of which p
 12. **Retry Phase**: In this phase, the reconciler handles any retries that occur during the reconciliation process. This phase is where the reconciler handles any retries that occur during the reconciliation process.
 13. **Abort Phase**: In this phase, the reconciler handles any aborts that occur during the reconciliation process. This phase is where the reconciler handles any aborts that occur during the reconciliation process.
 14. **Complete Phase**: In this phase, the reconciler completes the reconciliation process and updates the UI to reflect the changes in the application state. This phase is where the reconciliation process is completed and the UI is updated.
+
+React does `Object.is(ElementBeforeRender, ElementAfterRender)` to determine if the element has changed. If it has
+changed(means `false`), React will update the element in the DOM. If it hasn't changed(means `true`), React will not
+update the element in the DOM. React do not compare the children of the element. React will update the children of the
+element if the parent element has changed. React will not update the children of the element if the parent element has
+not changed. Also, React done shallow comparison not deep comparison.
+
+When the comparison return `false`, first it will check type
+* **Same Type:** Will re-render the component so the state will be preserved.
+* **Different Type:** Will unmount the old component and mount the new component in the DOM so old state will be lost.
+  and the new component will be mounted in the DOM.
 
 # Fiber Reconciliation Strategies
 The fiber reconciler uses several strategies to optimize the reconciliation process and make it more efficient. Some of the strategies used by the reconciler include:
@@ -156,3 +147,524 @@ The fiber diffing algorithm is divided into several phases, each of which perfor
 33. **Element Update Fallback Phase**: In this phase, the diffing algorithm handles fallbacks that occur during the update process and processes them accordingly.
 34. **Component Update Fallback Phase**: In this phase, the diffing algorithm handles fallbacks that occur during the update process and processes them accordingly.
 
+In React, the "diffing algorithm" and "fiber diff" refer to different concepts, though they are related to how React updates the DOM efficiently.
+
+## Diffing Algorithm
+The diffing algorithm is a general term that refers to the process by which React determines what has changed in the virtual DOM and what needs to be updated in the actual DOM. The key steps include:
+
+* Virtual DOM: React creates an in-memory representation of the real DOM called the virtual DOM.
+* Rendering: When state or props change, React renders a new virtual DOM tree.
+* Diffing: React compares the new virtual DOM tree with the previous one to identify what has changed. This process is called "reconciliation."
+* Updating: Based on the differences, React updates the real DOM to match the new virtual DOM.
+
+React's diffing algorithm uses heuristics to make this process efficient:
+
+* Element Type: If elements are of different types, React will replace the old element with the new one.
+* Keys: Keys help React identify which items have changed, are added, or are removed.
+* Tree Diffing: React only compares sibling elements. It doesn't re-render the entire subtree if only parts of it have changed.
+
+## Fiber Diff
+React Fiber is a reimplementation of the React reconciliation algorithm. It was introduced in React 16 to address several limitations of the original algorithm and to enable new features. The key improvements and features include:
+
+* Incremental Rendering: Fiber allows React to split rendering work into chunks and spread it out over multiple frames. This makes it possible to interrupt rendering work to handle more urgent tasks, such as responding to user input.
+* Prioritization: With Fiber, React can assign priority levels to different updates. For example, animations and user interactions can be prioritized over less important updates.
+* Concurrency: Fiber lays the groundwork for future features that will enable React to work with concurrent rendering, where multiple rendering passes can be made without blocking the main thread.
+* Error Handling: Improved error handling and the introduction of error boundaries.
+
+The fiber architecture achieves these goals by breaking the work into units called "fibers." Each fiber represents a part of the virtual DOM tree and can be processed independently. The fiber diffing process is more granular and allows React to pause, resume, and prioritize work.
+
+#### Summary
+Diffing Algorithm: Refers to the general process of comparing virtual DOM trees and updating the real DOM.
+Fiber Diff: Refers to the specific implementation of the diffing algorithm in React Fiber, which introduces incremental rendering, prioritization, and concurrency.
+While both terms are related to how React updates the DOM, the fiber diff is a more advanced and flexible approach introduced with React Fiber to improve performance and enable new features.
+
+
+
+
+
+
+```jsx
+const Component = () => {
+    return (
+      <div>
+      <Input placeholder="Text1" id="1" />
+      <Input placeholder="Text2" id="2" />
+    </div>
+    );
+};
+```
+This jsx will be converted to the following js code.
+```jsx
+const Component = () => {
+    return React.createElement(
+      "div",
+      null,
+      React.createElement(Input, { placeholder: "Text1", id: "1" }),
+      React.createElement(Input, { placeholder: "Text2", id: "2" })
+    );
+};
+```
+
+will be represented while diffing as
+
+```json
+{
+  "type": "div",
+  "props": {
+    "children": [
+      {
+        "type": "input",
+        "props": {
+          "placeholder": "Text1",
+          "id": "1"
+        }
+      },
+      {
+        "type": "input",
+        "props": {
+          "placeholder": "Text2",
+          "id": "2"
+        }
+      }
+    ]
+  }
+}
+```
+
+
+
+
+
+
+```jsx
+const Input = ({ placeholder, id }) => {
+
+    return (
+      <input 
+        type="text" 
+        id={id} 
+        placeholder={placeholder}
+      />
+    );
+};
+
+// somewhere else
+<Input placeholder="Input something here" />;
+```
+
+In this example we write something in the input box and then change the state then the input box will be re-rendered and
+also will be unmounted and mounted again. The state will be lost and input box will be empty which was we wanted.
+```jsx
+const Form = () => {
+    const [isCompany, setIsCompany] = useState(false);
+
+    return (
+        <>
+          {/* checkbox somewhere here */}
+          {isCompany ? (
+              <Input id="company-tax-id-number" placeholder="Enter you company ID" ... />
+            ) : (
+                <TextPlaceholder />
+            )}
+        </>
+    )
+}
+```
+As we can see before and after the update of component the type of the component is changed. So, React will unmount the
+old component and mount the new component in the DOM. The state will be lost and the input box will be empty.
+```js
+// Before update, isCompany was "true"
+{
+  type: Input,
+...
+}
+// After update, isCompany is "false"
+{
+  type: TextPlaceholder,
+...
+}
+```
+
+
+
+But in this example we write something in the input box and then change the state then the input box will be re-rendered,
+but it will not be unmounted and mounted again. The state will be preserved and input box will not be empty which was we
+wanted.
+```jsx
+const Form = () => {
+    const [isCompany, setIsCompany] = useState(false);
+
+    return (
+        <>
+          <Checkbox onChange={() => setIsCompany(!isCompany)} />
+          
+          {isCompany ? (
+              <Input id="company-tax-id-number" placeholder="Enter you company Tax ID" ... />
+            ) : (
+                <Input id="person-tax-id-number" placeholder="Enter you personal Tax ID" ... />
+            )}
+        </>
+    )
+}
+```
+At the first render, the component will be rendered as
+```json
+{
+  "type": "Input",
+  "props": {
+    "id": "company-tax-id-number",
+    "placeholder": "Enter you company Tax ID"
+  }
+}
+```
+After the update, the component will be rendered as
+```json
+{
+  "type": "Input",
+  "props": {
+    "id": "person-tax-id-number",
+    "placeholder": "Enter you personal Tax ID"
+  }
+}
+```
+As type of the component is same, React will re-render the component so the state will be preserved. No unmounting and
+mounting will be done. The input box will not be empty.
+
+If the `isCompany` variable changes from `true` to `false` here, which objects will be compared?
+Before, `isCompany` is `true` :
+```json
+{
+  "type": "Input",
+  "props": {
+    "id": "company-tax-id-number",
+    "placeholder": "Enter you company Tax ID"
+  }
+}
+```
+After, `isCompany` is `false` :
+```json
+{
+  "type": "Input",
+  "props": {
+    "id": "person-tax-id-number",
+    "placeholder": "Enter you personal Tax ID"
+  }
+}
+```
+As the type are same, React will just re-render the component will not unmount and mount the component.
+
+To resolve this we can use `key` prop in the component. If we use `key` prop in the component, React will compare the
+components based on the `key` prop. If the `key` prop is same, React will not unmount and mount the component. React will
+just re-render the component. If the `key` prop is different, React will unmount the old component and mount the new
+component in the DOM. The state will be lost and the input box will be empty.
+```jsx
+const Form = () => {
+    const [isCompany, setIsCompany] = useState(false);
+
+    return (
+        <>
+          <Checkbox onChange={() => setIsCompany(!isCompany)} />
+          
+          {isCompany ? (
+              <Input key="company" id="company-tax-id-number" placeholder="Enter you company Tax ID" ... />
+            ) : (
+                <Input key="personal" id="person-tax-id-number" placeholder="Enter you personal Tax ID" ... />
+            )}
+        </>
+    )
+}
+```
+At the first render, the component will be rendered as
+```json
+{
+  "type": "Input",
+  "key": "company",
+  "props": {
+    "id": "company-tax-id-number",
+    "placeholder": "Enter you company Tax ID"
+  }
+}
+```
+After the update, the component will be rendered as
+```json
+{
+  "type": "Input",
+  "key": "personal",
+  "props": {
+    "id": "person-tax-id-number",
+    "placeholder": "Enter you personal Tax ID"
+  }
+}
+```
+As the `key` are different, React will unmount the old component and mount the new component in the DOM. The state will be
+lost and the input box will be empty.
+Also we can use `null` to fix the issue.
+```jsx
+const Form = () => {
+    const [isCompany, setIsCompany] = useState(false);
+
+    return (
+        <>
+            <Checkbox onChange={() => setIsCompany(!isCompany)} />
+            {isCompany ? <Input id="company-tax-id-number" ... /> : null}
+            {!isCompany ? <Input id="person-tax-id-number" ... /> : null}
+        </>
+    )
+}
+```
+
+
+# `key` prop
+The `key` prop is a special attribute that React uses to identify elements in a list. When rendering a list of elements,
+React uses the `key` prop to determine which elements have changed, are added, or are removed. The `key` prop should be
+unique for each element in the list and should not change over time.
+
+When an element is added to a list, React uses the `key` prop to determine where to insert the new element. When an 
+element is removed from a list, React uses the `key` prop to identify which element to remove. When an element is 
+updated in a list, React uses the `key` prop to determine which element has changed.
+
+Common misconceptions about the `key` is it needs for performance. But it is not true. The `key` prop is not used for
+performance optimization. It is used to identify elements in a list and determine which elements have changed, are added,
+or are removed.
+
+If we want to stop re-rendering we can use `React.memo`. For static array we can use `React.memo` and for `key` prop we
+use some sort of `id` or index as `key` prop. 
+- If we use `id` as `key` prop, we can use `React.memo` to stop re-rendering.
+  ```jsx
+    const Form = () => {
+        const [inputs, setInputs] = useState([
+            { id: 1, placeholder: "Enter your name" },
+            { id: 2, placeholder: "Enter your email" },
+            { id: 3, placeholder: "Enter your phone number" },
+        ]);
+    
+        return (
+            <>
+                {inputs.map((input) => (
+                    <Input key={input.id} id={input.id} placeholder={input.placeholder} ... />
+                ))}
+            </>
+        )
+    }
+    
+    const Input = React.memo(({ id, placeholder }) => {
+        return (
+            <input type="text" id={id} placeholder={placeholder} />
+        );
+    });
+  ```
+- If we use index as `key` prop, we `React.memo` will not work as expected. Because the index will be changed when the
+  array is changed. So, the `key` prop will be changed and the component will be unmounted and mounted again. The state
+  will be lost and the input box will be empty
+  ```jsx
+    const Form = () => {
+        const [inputs, setInputs] = useState([
+            { id: 1, placeholder: "Enter your name" },
+            { id: 2, placeholder: "Enter your email" },
+            { id: 3, placeholder: "Enter your phone number" },
+        ]);
+    
+        return (
+            <>
+                {inputs.map((input, index) => (
+                    <Input key={index} id={input.id} placeholder={input.placeholder} ... />
+                ))}
+            </>
+        )
+    }
+
+  ```
+  
+## Preventing unnecessary re-renders with React.memo
+If we want to prevent re-renders of items, we need to use `React.memo` to wrap the component. 
+
+In this example, if parent component re-renders, the `InputMemo` component will not re-render if the props are the same.
+```jsx
+const data = [
+    { id: 'business', placeholder: 'Business Tax' },
+    { id: 'person', placeholder: 'Person Tax' },
+];
+
+const InputMemo = React.memo(Input);
+const Component = () => {
+    // array's index is fine here, the array is static
+    return data.map((value, index) => (
+        <InputMemo
+            key={index}
+            placeholder={value.placeholder}
+        />
+    ));
+};
+```
+
+### Swapping elements
+But with dynamic array if we sort swap the business and person tax, the `InputMemo` component will re-render. After sorting
+the array with `key=0` and `key=1` are same type and same key but as the props `placeholder` are different for first element,
+it changed from "Business Tax" to "Person Tax" the `InputMemo` component will re-render.
+```js
+// array before re-render
+[
+    { id: 'business', placeholder: 'Business Tax' },
+    { id: 'person', placeholder: 'Person Tax' },
+]
+// array after re-render
+[
+    { id: 'person', placeholder: 'Person Tax' },
+    { id: 'business', placeholder: 'Business Tax' },
+]
+```
+<img src="./images/fiber_diff-algorithm/key1.png" alt="key1">
+
+source: [Advanced React](https://www.advanced-react.com/)
+
+To fix this issue, we can use `id` as `key` prop. As the `id` is unique for each element, React will not re-render the
+component. The `InputMemo` component will not re-render.
+```jsx
+const data = [
+    { id: 'business', placeholder: 'Business Tax' },
+    { id: 'person', placeholder: 'Person Tax' },
+];
+
+const InputMemo = React.memo(Input);
+const Component = () => {
+    return data.map((value) => (
+        <InputMemo
+            key={value.id}
+            placeholder={value.placeholder}
+        />
+    ));
+};
+```
+If the data has nothing unique like an id , then we'd need to iterate over that array somewhere outside of the component
+that re-renders and add that id there manually.
+
+In our case of our inputs, if we use the id for key , the item with the key="business" will still have the prop 
+placeholder="Business Tax" just in a different place in the array. So React will just swap the associated DOM nodes 
+around, but the actual component won't rerender.
+
+<img src="./images/fiber_diff-algorithm/key2.png" alt="key2" />
+
+source: [Advanced React](https://www.advanced-react.com/)
+
+### Adding new element at the top
+If we were adding another input at the beginning of the array. If we use the array's index as key , then the item with 
+the key="0" , from React's perspective, will just change its placeholder prop from "Business Tax" to "New tax"; key="1"
+item will transition from "Person Tax" to "Business Tax". So they both will re-render. And the new item with the key="2" 
+and the text "Person Tax" will be mounted from scratch.
+
+<img src="./images/fiber_diff-algorithm/key3.png" alt="key3" />
+
+source: [Advanced React](https://www.advanced-react.com/)
+
+And if we use the id as a key instead, then both "Business Tax" and "Person Tax" will keep their keys, and since they 
+are memoized, they won't re-render. And the new item, with the key "New tax", will be mounted from scratch.
+
+<img src="./images/fiber_diff-algorithm/key4.png" alt="key4" />
+
+source: [Advanced React](https://www.advanced-react.com/)
+
+**This technique is known as "state reset".** It is used to reset the state of the component when the component is unmounted
+and mounted again of an uncontrolled component like input box.
+
+
+### Using "key" to force reuse of an existing element
+In this example component will be re-rendered and will unmount and mount again. The state will be lost and the input box
+will be empty.
+```jsx
+const Form = () => {
+    const [isCompany, setIsCompany] = useState(false);
+    
+    return (
+        <>
+          <Checkbox onChange={() => setIsCompany(!isCompany)} />
+          {isCompany ? <Input id="company-tax-id-number" ... /> : null}
+          {!isCompany ? <Input id="person-tax-id-number" ... /> : null}
+        </>
+    )
+}
+```
+But in this example component will be re-rendered and will not unmount and mount again. The state will be preserved and
+the input box will not be empty. Because the `key` prop is same for both components.
+```jsx
+const Form = () => {
+    const [isCompany, setIsCompany] = useState(false);
+    
+    return (
+        <>
+          <Checkbox onChange={() => setIsCompany(!isCompany)} />
+          {isCompany ? <Input id="company-tax-id-number" key="tax-input" ... /> : null}
+          {!isCompany ? <Input id="person-tax-id-number" key="tax-input"... /> : null}
+        </>
+    )
+}
+```
+Before `isCompany` is `false`
+```json
+{
+  "type": "Input",
+  "key": "tax-input",
+  "props": {
+    "id": "person-tax-id-number"
+  }
+}
+```
+After `isCompany` is `true`
+```json
+{
+  "type": "Input",
+  "key": "tax-input",
+  "props": {
+    "id": "company-tax-id-number"
+  }
+}
+```
+As the `key` prop is same, React will not unmount and mount the component. React will just re-render the component so the
+state will be preserved. The input box will not be empty.
+
+#### Why react force key only for array?
+React needs to know which elements have changed, are added, or are removed. When rendering a list of elements, React uses
+the `key` prop to determine which elements have changed, are added, or are removed. The `key` prop should be unique for
+each element in the list and should not change over time.
+
+```jsx
+const data = ['1', '2'];
+
+const Component = () => {
+    return (
+        <>
+          {data.map((i) => (
+              <Input key={i} id={i} />
+          ))}
+          {/* will this input re-mount if I add a new item in the array above? */}
+          <Input id="3" />
+        </>
+    );
+};
+```
+We can think react will define object like this. So if we add another element then it will with key 3 and react have to
+place it after key 2. 
+```jsx
+[
+    { type: Input, key: 1 }, // input from the array
+    { type: Input, key: 2 }, // input from the array
+    { type: Input }, // input after the array
+];
+```
+But this is not the case. First one is the array and the second one is the manual input. So, the manual input will not be
+unmounted and mounted again. The state will be preserved and the input box will not be empty.
+```js
+[
+    // the entire dynamic array is the first position in the children's array
+    [
+        { type: Input, key: 1 },
+        { type: Input, key: 2 },
+    ],
+    {
+        type: Input, // this is our manual Input after the array
+    },
+];
+```
+
+
+#### Source:
+* [Advanced React](https://www.advanced-react.com/)
