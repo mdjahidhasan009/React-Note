@@ -1,5 +1,5 @@
 
-### When should we use refs?
+## When should we use refs?
 * To keep the value between render cycles. But no need to re-render the component when the value changes.
 * <details>
     <summary>Ref instant of DOM API Selector for getting the DOM element</summary>
@@ -19,8 +19,10 @@
         export default RefsMistake;
     ```
   We should not use `querySelector` to get the DOM element. Instead, we should use refs. Because
-    * `querySelector` is not aware of React's render and commit phase. Refs are aware of React's render and commit phase. So, we can use refs to get the DOM element.
-    * **Vulnerable to DOM changes.** We have write specific selector to get the element. If the element is moved, the selector will break. Like this
+    * **`querySelector` is not aware of React's render and commit phase**. Refs are aware of React's render and commit 
+      phase. So, we can use refs to get the DOM element.
+    * **Vulnerable to DOM changes.** We have write specific selector to get the element. If the element is moved, the 
+      selector will break. Like this
 
         ```jsx
             function RefsMistake(props) {
@@ -38,9 +40,21 @@
             }
             export default RefsMistake;
         ```
-      We have to change the selector to `form :nth-child(3)` to get the username input element.
-    * **No isolation between components**. As it operates on windows object, other components this form may also get affected.
+      We have to change the selector to `form :nth-child(3)` to get the `username` input element.
+    * **No isolation between components**. As it operates on windows object, other components this form may also get 
+      affected.
   </details>
+
+Once that ref is created, we can assign anything to it within `useEffect` or event handlers. It's just an object, 
+  nothing special:
+  ```jsx
+    const Component = () => {
+        useEffect(() => {
+          // assign url as an id, when it changes
+          ref.current = { id: url };
+        }, [url]);  
+   };
+  ```
 
 ### When should we not use refs?
 * <details>
@@ -299,19 +313,105 @@
     ```
   </details>
 
-# DOM API
+If any state changes inside of a component then the component will rerender and will see the latest data of ref. In this
+case if we open/close the dialog then we will see the latest value of `numberOfLetters` in UI.
+```js
+const Form = () => {
+    // state for the dialog
+    const [isOpen, setIsOpen] = useState(false);
+    const ref = useRef();
+    const numberOfLetters = ref.current?.length ?? 0;
+    
+    return (
+        <>
+            <input type="text" onChange={onChange} />
+            {/* This will not change when you type in the field */}
+            {/* Only when you open/close the dialog */}
+             Characters count: {numberOfLetters}
+            <button onClick={submit}>submit</button>
+            {/* Adding dialog here */}
+            <button onClick={() => setIsOpen(true)}>
+                Open dialog
+            </button>
+            {isOpen ? <ModalDialog onClose={() => setIsOpen(false)} /> : null}
+        </>
+    );
+};
+```
+# will add
+https://advanced-react.com/examples/09/02
 
-## Refs (escape hatch, imperative paradigm)
-> We can use those same refs to interact with the DOM directly. As they do not directly interact with 
-> the react operation, they are considered an escape hatch.
+It gets even more interesting than that. That change in value will not be picked up by the downstream components if 
+passed as props as a primitive value either.
+```js
+const SearchResults = ({ search }) => {
+    const [showResults, setShowResults] = useState(false);
+        
+    return (
+        <>
+          Searching for: {search} <br />
+          {/*This will trigger re-render*/}
+          <button onClick={() => setShowResults(!showResults)}>
+            show results
+          </button>
+        </>
+    );
+};
+```
+If I use that component in our Form where we saved the value in Ref, it just won't work. Ref update never triggers a re-render, so the search prop on the
+SearchResults component is never explicitly updated. Even when we trigger a re-render inside SearchResults by clicking the "show
+results" button, the search value remains an empty string.
+# will add
+https://advanced-react.com/examples/09/03
+
+
+## Ref vs State
+* Ref are synchronous and state are asynchronous. It's even more than asynchronous: state updates are run in "snapshots".
+  React has a complicated system that manages it and makes sure that the data and components within one "snapshot" are 
+  consistent and updated properly.
+* Ref we mutating the object and state update is not mutating.
+
+
+State update asynchronous, becomes very visible when we try to access state and ref values in the onChange callback after
+setting both of them.
+```js
+const Form = () => {
+    const [value, setValue] = useState();
+    const onChange = (e) => {
+        console.log('before', value);
+        setValue(e.target.value);
+        console.log('after', value); // same as before
+    };
+};
+```
+But in ref
+```js
+const Form = () => {
+    const ref = useRef();
+    const onChange = (e) => {
+        console.log('before', ref.current);
+        ref.current = e.target.value;
+        console.log('after', ref.current); // already changed
+    };
+};
+```
+
+
+## DOM API
+
+### Refs (escape hatch, imperative paradigm)
+> We can use those same refs to interact with the DOM directly. As they do not directly interact with the react 
+> operation, they are considered an escape hatch.
 * measurements
-* focus
+* focusing an element after it's rendered, like an input field in a form
 * text selection
-* scroll
+* scrolling to and element after it appears on the screen.
 * media playback
+* detecting a click outside of a component when showing popup-like element.
+* calculating sizes and boundaries of a components on the screen to correctly position something like a tooltip.
 * & more
 
-## Controlled by React
+### Controlled by React
 * CSS classes
 * inline styles
 * innerHTML
@@ -328,3 +428,4 @@
 
 # Sources
 * [Essential React: 5 Mistakes to Master React DOM Refs](https://www.youtube.com/watch?v=XL7h3sjnLaY)
+* [Advanced React](https://www.advanced-react.com/)
