@@ -494,15 +494,12 @@ const withNavigationOpen = (AnyComponent) => {
     };
 };
 ```
-Now, when the Context value changes, the component that uses anything from Context will still re-render: our unnamed component that we
-return from the withNavigationOpen function. But this component
-renders another component that is memoized. So if its props don't
-change, it won't re-render because of this re-render. And the props won't
-change: those that are spread are coming from "outside", so they won't
-be affected by the context change. And the open function is memoized
-inside the Context provider itself.
-Our SomeHeavyComponent can safely use the openNav function: it
-won't re-render when the Context value changes.
+Now, when the context value changes, the component that uses anything from context will still re-render: our unnamed 
+component that we return from the `withNavigationOpen` function. But this component renders another component that is 
+memoized. So if its props don't change, it won't re-render because of this re-render. And the props won't change: those
+that are spread are coming from "outside", so they won't be affected by the context change. And the open function is 
+memoized inside the Context provider itself. Our `SomeHeavyComponent` can safely use the openNav function: it won't 
+re-render when the context value changes.
 
 # will add
 https://advanced-react.com/examples/08/07
