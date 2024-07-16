@@ -640,7 +640,8 @@ use forward API and you can switch to custom ref pattern to get all the benefits
 
 
 ### Source
-[Goodbye, forwardRef](https://www.youtube.com/watch?v=m4QbeS9BTNU)
+* [Goodbye, forwardRef](https://www.youtube.com/watch?v=m4QbeS9BTNU)
+* [Advanced React](https://www.advanced-react.com/)
 
 ### Will add
 * [TypeScript + React: Typing Generic forwardRefs](https://fettblog.eu/typescript-react-generic-forward-refs/)
