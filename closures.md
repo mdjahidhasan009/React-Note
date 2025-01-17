@@ -381,5 +381,5 @@ Source: https://www.advanced-react.com/examples/10/05
 
 
 
-# Sources
+# References
 * [Advanced React](https://www.advanced-react.com/)
