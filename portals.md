@@ -339,8 +339,8 @@ Consequences of keeping components in single virtual DOM
 - Picture-in-Picture API
 
 **One limitation of this technics**
-- We can only portal to the windows that we expicitly open from our code using `window.open()`. This is security aspect of browser. 
-  If we do not save the reference to the window object that we open then we can't portal to that window.
+- We can only portal to the windows that we expicitly open from our code using `window.open()`. This is security aspect 
+  of browser. If we do not save the reference to the window object that we open then we can't portal to that window.
 - We can't portal to the windows or tabs that are already opened by the user or by the browser itself.
 
 ### Sources

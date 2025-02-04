@@ -163,7 +163,9 @@ But we can pass multiple refs wrapping them in an object. But it is not a good p
     export default GoodbyeForwardRef;
 ```
 
-We can also use `useImperativeHandle` to expose only the required methods to the parent component.
+We can also use `useImperativeHandle` to expose only the required methods to the parent component. It's an escape hatch 
+to access the instance of the child component. In the below example, `formRef.current` will have only `inputRef1` and 
+`inputRef2`.
 ```jsx
 import { useRef, useImperativeHandle, forwardRef } from "react";
 
@@ -638,7 +640,8 @@ use forward API and you can switch to custom ref pattern to get all the benefits
 
 
 ### Source
-[Goodbye, forwardRef](https://www.youtube.com/watch?v=m4QbeS9BTNU)
+* [Goodbye, forwardRef](https://www.youtube.com/watch?v=m4QbeS9BTNU)
+* [Advanced React](https://www.advanced-react.com/)
 
 ### Will add
 * [TypeScript + React: Typing Generic forwardRefs](https://fettblog.eu/typescript-react-generic-forward-refs/)
