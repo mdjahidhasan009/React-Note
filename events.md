@@ -81,5 +81,149 @@ React **does not modify** the native event itself, but it provides a wrapper (`S
 compatibility and performance.
 
 
+## Pointer Events in React
+In React, pointer events refer to a set of events that handle input from various pointing devices, such as a mouse, pen,
+or touchscreen. These events provide a unified way to handle interactions across different devices and input methods. 
+Pointer events are part of the Pointer Events API, which is a modern standard for handling input from multiple sources.
+
+Some common pointer events in React include:
+### `onPointerDown`
+Fires when a pointing device button is pressed (e.g., mouse click, touch start).
+```jsx
+const handlePointerDown = (event) => {
+  console.log('Pointer down:', event);
+};
+
+return <div onPointerDown={handlePointerDown}>Press me</div>;
+```
+
+### `onPointerMove`
+Fires when the pointer moves (e.g., mouse movement, touch drag).
+```jsx
+const handlePointerMove = (event) => {
+  console.log('Pointer move:', event.clientX, event.clientY);
+};
+
+return <div onPointerMove={handlePointerMove}>Move over me</div>;
+```
+
+### `onPointerUp`
+Fires when a pointing device button is released (e.g., mouse release, touch end).
+```jsx
+const handlePointerUp = (event) => {
+  console.log('Pointer up:', event);
+};
+
+return <div onPointerUp={handlePointerUp}>Release me</div>;
+```
+
+### `onPointerCancel`
+Fires when the pointer interaction is canceled (e.g., touch is interrupted).
+```jsx
+const handlePointerCancel = (event) => {
+  console.log('Pointer canceled:', event);
+};
+
+return <div onPointerCancel={handlePointerCancel}>Interact with me</div>;
+```
+
+### `onGotPointerCapture`
+* This event fires when an element successfully captures a pointer using the `setPointerCapture()` method.
+* It indicates that the element will now receive all pointer events for the captured pointer, regardless of where the 
+  pointer moves.
+```jsx
+import React from 'react';
+
+const CaptureExample = () => {
+  const handleGotPointerCapture = (event) => {
+    console.log('Pointer captured:', event.pointerId);
+  };
+
+  return (
+    <div
+      onGotPointerCapture={handleGotPointerCapture}
+      onPointerDown={(event) => event.currentTarget.setPointerCapture(event.pointerId)}
+      style={{ width: '100px', height: '100px', backgroundColor: 'lightblue' }}
+    >
+      Click and drag
+    </div>
+  );
+};
+
+export default CaptureExample;
+```
+
+
+### `onLostPointerCapture`
+* This event fires when a captured pointer is released, either explicitly using `releasePointerCapture()` or implicitly
+  (e.g., when the pointer is released or the element is removed from the DOM).
+* It indicates that the element will no longer receive pointer events for that pointer.
+```jsx
+import React from 'react';
+
+const CaptureExample = () => {
+  const handleLostPointerCapture = (event) => {
+    console.log('Pointer capture lost:', event.pointerId);
+  };
+
+  return (
+    <div
+      onLostPointerCapture={handleLostPointerCapture}
+      onPointerDown={(event) => event.currentTarget.setPointerCapture(event.pointerId)}
+      onPointerUp={(event) => event.currentTarget.releasePointerCapture(event.pointerId)}
+      style={{ width: '100px', height: '100px', backgroundColor: 'lightblue' }}
+    >
+      Click and drag
+    </div>
+  );
+};
+
+export default CaptureExample;
+```
+
+### `onPointerEnter`
+Similar to `onPointerOver`, but does not bubble (i.e., it doesn't propagate to parent elements).
+```jsx
+const handlePointerEnter = (event) => {
+  console.log('Pointer enter:', event);
+};
+
+return <div onPointerEnter={handlePointerEnter}>Enter me</div>;
+```
+
+### `onPointerLeave`
+Similar to `onPointerOut`, but does not bubble.
+```jsx
+const handlePointerLeave = (event) => {
+  console.log('Pointer leave:', event);
+};
+
+return <div onPointerLeave={handlePointerLeave}>Leave me</div>;
+```
+
+### `onPointerOver`
+Fires when the pointer enters an element's boundary.
+```jsx
+const handlePointerOver = (event) => {
+  console.log('Pointer over:', event);
+};
+
+return <div onPointerOver={handlePointerOver}>Hover over me</div>;
+```
+
+### `onPointerOut`
+Fires when the pointer leaves an element's boundary.
+```jsx
+const handlePointerOut = (event) => {
+  console.log('Pointer out:', event);
+};
+
+return <div onPointerOut={handlePointerOut}>Leave me</div>;
+```
+
+
+
+
+
 ### References
 * [reactjs-interview-questions - github](https://github.com/sudheerj/reactjs-interview-questions)

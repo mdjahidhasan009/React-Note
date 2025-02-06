@@ -2,11 +2,11 @@
 It helps a lot to escape from the parent div's css properties like `overflow: hidden` or `z-index` or `position: relative` or `position: absolute`
 
 In this example we put border around the parent div and the two parent paragraph's placed in the parent div. But border 
-only applied with the parent div which is placed normaly but for the second paragraph which is placed using `createPortal`
-at `document.body` doesn't have border. So it is rendering outside of MyComponent's DOM node.
+only applied with the parent div which is placed normally but for the second paragraph which is placed using 
+`createPortal`at `document.body` doesn't have border. So it is rendering outside of MyComponent's DOM node.
 </br>
 
-<img src="./images/portal/portal.png" src="potal" />
+<img src="./images/portal/portal.png" alt="portal" />
 
 ```jsx
 import { createPortal } from 'react-dom';

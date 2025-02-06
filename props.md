@@ -190,6 +190,61 @@ class ParentComponent extends React.Component {
 
 
 
+# `children` prop
+The `children` prop is a special prop that is passed a child component into a parent component. The `children` prop is
+used to render the child component inside the parent component.
+
+### Example
+**Functional Component**
+
+```jsx
+function MyDiv({ children }){
+  return (
+    <div>
+      {children}
+    </div>
+  );
+}
+
+export default function Greeting() {
+  return (
+    <MyDiv>
+      <span>{"Hello"}</span>
+      <span>{"World"}</span>
+    </MyDiv>
+  );
+}
+```
+
+**Class Component**
+```jsx
+const MyDiv = React.createClass({
+  render: function () {
+    return <div>{this.props.children}</div>;
+  },
+});
+
+ReactDOM.render(
+  <MyDiv>
+    <span>{"Hello"}</span>
+    <span>{"World"}</span>
+  </MyDiv>,
+  node
+);
+```
+There are several methods in legacy React API to work with children props like `React.Children.map`, 
+`React.Children.forEach`, `React.Children.count`, `React.Children.toArray`, `React.Children.only` etc.
+
+
+
+
+
+
+
+
+
+
+
 
 # `key` prop
 The `key` prop is a special attribute that React uses to identify elements in a list. When rendering a list of elements,
@@ -211,6 +266,7 @@ or are removed.
 * The key attribute accepts either string or number and internally convert it as string type.
 * Don't generate the key on the fly something like `key={Math.random()}`. Because the keys will never match up between
   re-renders and DOM created everytime.
+* If we don't specify the `key` prop, React will use the index of the array as the key. But it is not recommended.
 
 If we want to stop re-rendering we can use `React.memo`. For static array we can use `React.memo` and for `key` prop we
 use some sort of `id` or index as `key` prop.
@@ -722,6 +778,67 @@ const Layout = () => {
     );
 };
 ```
+
+
+
+
+
+
+# Props validation in react
+React provides a way to validate the props that are passed to a component. This is done using the `propTypes` property 
+of the component. The `propTypes` property is an object that defines the types of the props that the component expects.
+
+The set of predefined prop types:
+
+* `PropTypes.number`
+* `PropTypes.string`
+* `PropTypes.array`
+* `PropTypes.object`
+* `PropTypes.func`
+* `PropTypes.node`
+* `PropTypes.element`
+* `PropTypes.bool`
+* `PropTypes.symbol`
+* `PropTypes.any`
+
+
+### Examples
+**Class Component**
+```jsx
+import React from 'react';
+import PropTypes from 'prop-types';
+
+class Greeting extends React.Component {
+  render() {
+    return <h1>Hello, {this.props.name}</h1>;
+  }
+}
+
+Greeting.propTypes = {
+  name: PropTypes.string.isRequired
+};
+
+export default Greeting;
+```
+
+**Functional Component**
+```jsx
+import React from 'react';
+import PropTypes from 'prop-types';
+
+const Greeting = ({ name }) => <h1>Hello, {name}</h1>;
+
+Greeting.propTypes = {
+  name: PropTypes.string.isRequired
+};
+  
+export default Greeting;
+```
+
+
+
+
+
 
 ### References:
 * [Advanced React](https://www.advanced-react.com/)

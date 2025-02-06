@@ -1,37 +1,98 @@
-# Fiber Tree
-Fiber tree is a tree structure that represents the structure of the UI elements in the application. It is a lightweight version of the React element tree. The fiber tree is used by the reconciler to perform the diffing algorithm and update the UI.
+# React Fiber
+Fiber is the new reconciliation engine or reimplementation of core algorithm in React 16. It is a complete rewrite of 
+React's internals. The goal of React Fiber is to increase its suitability for areas like animation, layout, 
+gestures, ability to pause, abort, or reuse work, and assign priority to different types of updates; and new features
+like error boundaries and fragments.
 
+## Goal of React Fiber
+The goal of React fiber is to increase its suitability for areas like animation, layout, gestures, ability to pause,
+abort, or reuse work, and assign priority to different types of updates; and new features like error boundaries and
+fragments. Its main feature is incremental rendering ability to split rendering work into chunks and spread it over 
+multiple frames. This makes it possible to interrupt rendering work to handle more urgent tasks, such as responding to
+user input.
+
+* Ability to split interruptible work in chunks.
+* Ability to prioritize, rebase and reuse work.
+* Ability to yield back and forth between parents and children to support layout in React.
+* Ability to return multiple elements from `render()`
+* Better support for error boundaries.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Fiber Tree
+Fiber tree is a tree structure that represents the structure of the UI elements in the application. It is a lightweight
+version of the React element tree. The fiber tree is used by the reconciler to perform the diffing algorithm and update 
+the UI.
 
 # Fiber Node
-Fiber node is a JavaScript object that represents a single element in the fiber tree. It contains information about the element, such as its type, props, and children. The fiber node also contains information about the element's state, such as whether it is mounted or unmounted, and whether it needs to be updated.
+Fiber node is a JavaScript object that represents a single element in the fiber tree. It contains information about the
+element, such as its type, props, and children. The fiber node also contains information about the element's state, such
+as whether it is mounted or unmounted, and whether it needs to be updated.
 
 # Fiber Reconciliation
-Fiber reconciliation is the process of comparing two versions of the fiber tree and determining the differences between them. This process is used by React to efficiently update the UI in response to changes in the application state. The reconciler uses a diffing algorithm to compare the two versions of the fiber tree and determine which elements need to be added, removed, or updated.
+Fiber reconciliation is the process of comparing two versions of the fiber tree and determining the differences between
+them. This process is used by React to efficiently update the UI in response to changes in the application state. The
+reconciler uses a diffing algorithm to compare the two versions of the fiber tree and determine which elements need to
+be added, removed, or updated.
 
 # Fiber Diffing Algorithm
-The fiber diffing algorithm is the algorithm used by the reconciler to compare two versions of the fiber tree and determine the differences between them. The algorithm is based on the concept of "diffing" or "diffing" the two versions of the tree to determine which elements need to be added, removed, or updated. The algorithm is designed to be efficient and performant, so that updates to the UI can be made quickly and without unnecessary re-renders.
+The fiber diffing algorithm is the algorithm used by the reconciler to compare two versions of the fiber tree and 
+determine the differences between them. The algorithm is based on the concept of "diffing" or "diffing" the two versions
+of the tree to determine which elements need to be added, removed, or updated. The algorithm is designed to be efficient
+and performant, so that updates to the UI can be made quickly and without unnecessary re-renders.
 
 # Fiber Reconciler
-The fiber reconciler is the part of React that is responsible for updating the UI in response to changes in the application state. The reconciler uses the fiber tree and the fiber diffing algorithm to determine which elements need to be added, removed, or updated, and then updates the UI accordingly. The reconciler is designed to be efficient and performant, so that updates to the UI can be made quickly and without unnecessary re-renders.
+The fiber reconciler is the part of React that is responsible for updating the UI in response to changes in the 
+application state. The reconciler uses the fiber tree and the fiber diffing algorithm to determine which elements need 
+to be added, removed, or updated, and then updates the UI accordingly. The reconciler is designed to be efficient and
+performant, so that updates to the UI can be made quickly and without unnecessary re-renders.
 
 # Fiber Scheduler
-The fiber scheduler is the part of React that is responsible for scheduling updates to the UI. The scheduler uses a priority-based system to determine which updates should be processed first, based on the urgency of the update and the resources available. The scheduler is designed to be efficient and performant, so that updates to the UI can be made quickly and without unnecessary re-renders.
+The fiber scheduler is the part of React that is responsible for scheduling updates to the UI. The scheduler uses a 
+priority-based system to determine which updates should be processed first, based on the urgency of the update and the
+resources available. The scheduler is designed to be efficient and performant, so that updates to the UI can be made 
+quickly and without unnecessary re-renders.
 
 # Fiber Root
-The fiber root is the root of the fiber tree. It represents the top-level element in the application and contains information about the entire application, such as the root element, the container element, and the current version of the fiber tree. The fiber root is used by the reconciler to update the UI in response to changes in the application state.
+The fiber root is the root of the fiber tree. It represents the top-level element in the application and contains 
+information about the entire application, such as the root element, the container element, and the current version of
+the fiber tree. The fiber root is used by the reconciler to update the UI in response to changes in the application
+state.
 
 # Fiber Work Loop
-The fiber work loop is the process by which the reconciler updates the UI in response to changes in the application state. The work loop is an iterative process that runs continuously, processing updates to the UI in a prioritized order. The work loop is designed to be efficient and performant, so that updates to the UI can be made quickly and without unnecessary re-renders.
+The fiber work loop is the process by which the reconciler updates the UI in response to changes in the application
+state. The work loop is an iterative process that runs continuously, processing updates to the UI in a prioritized
+order. The work loop is designed to be efficient and performant, so that updates to the UI can be made quickly and
+without unnecessary re-renders.
 
 # Fiber Commit Phase
-The fiber commit phase is the final phase of the reconciliation process. In this phase, the reconciler applies the changes to the DOM and updates the UI to reflect the changes in the application state. The commit phase is designed to be efficient and performant, so that updates to the UI can be made quickly and without unnecessary re-renders.
+The fiber commit phase is the final phase of the reconciliation process. In this phase, the reconciler applies the
+changes to the DOM and updates the UI to reflect the changes in the application state. The commit phase is designed to 
+be efficient and performant, so that updates to the UI can be made quickly and without unnecessary re-renders.
 
 # Fiber Reconciliation Phases
-The fiber reconciliation process is divided into several phases, each of which performs a specific task in the reconciliation process. The phases are:
+The fiber reconciliation process is divided into several phases, each of which performs a specific task in the
+reconciliation process. The phases are:
 
-1. **Render Phase**: In this phase, the reconciler creates a new version of the fiber tree based on the current state of the application. This phase is where the diffing algorithm is used to determine the differences between the two versions of the tree.
-2. **Commit Phase**: In this phase, the reconciler applies the changes to the DOM and updates the UI to reflect the changes in the application state. This phase is where the changes are actually made to the UI.
-3. **Layout Phase**: In this phase, the reconciler calculates the layout of the elements in the UI and determines their position and size. This phase is where the layout of the UI is determined.
+1. **Render Phase**: In this phase, the reconciler creates a new version of the fiber tree based on the current state of 
+  the application. This phase is where the diffing algorithm is used to determine the differences between the two 
+  versions of the tree.
+2. **Commit Phase**: In this phase, the reconciler applies the changes to the DOM and updates the UI to reflect the 
+  changes in the application state. This phase is where the changes are actually made to the UI.
+3. **Layout Phase**: In this phase, the reconciler calculates the layout of the elements in the UI and determines their
+  position and size. This phase is where the layout of the UI is determined.
 4. **Paint Phase**: In this phase, the reconciler paints the elements on the screen and renders the final version of the UI. This phase is where the final version of the UI is rendered on the screen.
 5. **Commit Phase**: In this phase, the reconciler applies the changes to the DOM and updates the UI to reflect the changes in the application state. This phase is where the changes are actually made to the UI.
 6. **Cleanup Phase**: In this phase, the reconciler cleans up any resources that were used during the reconciliation process. This phase is where any resources that are no longer needed are released.
@@ -414,5 +475,6 @@ const Form = () => {
 ```
 
 
-#### Source:
+#### Resources:
 * [Advanced React](https://www.advanced-react.com/)
+* [reactjs-interview-questions - github](https://github.com/sudheerj/reactjs-interview-questions)

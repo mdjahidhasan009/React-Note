@@ -67,5 +67,20 @@ class Example extends React.Component {
 | **Reusability**        | Components using state alone are not reusable.  | Helps in making components reusable.            |
 
 
+
+
+
+# Lift State Up
+Lifting state up is a technique in React where you move the state from a child component to its parent component. This
+is useful when multiple components need to share the same state. By lifting the state up to the closest common ancestor,
+you can share the state between components without having to pass it down through multiple levels of the component tree.
+
+
+
+
+
+
+
+
 ### References
 * [reactjs-interview-questions - github](https://github.com/sudheerj/reactjs-interview-questions?tab=readme-ov-file#what-is-react)
