@@ -1,18 +1,9 @@
 # `props`
+- **Props are inputs to components.**
 - `props` are the first argument to the function component.
 - `props` is short for properties.
-- `props` is an object that holds information that a component needs to render.
 - `props` are immutable.
 - `props` are passed from parent to child component.
-- `props` are passed as attributes in JSX.
-- `props` are accessed in the component as an argument to the function.
-
-
-# Configuring components with props
-- `props` are used to configure components.
-- `props` are used to pass data to components.
-- `props` are used to pass event handlers to components.
-- `props` are used to pass children to components.
 
 ### `App.js`
 ```jsx
@@ -107,6 +98,7 @@ export default ErrorDialog;
 ### Default props for reducing redundancy and prop passing
 We can add default props to the `Button` component to reduce redundancy and prop passing. Also, can override the default 
 props when needed.
+
 ```tsx
 import React, { ReactElement } from 'react';
 
@@ -165,6 +157,308 @@ While this approach works pretty well for simple cases, it is not that
 good for something more complicated.
 
 
+Example in class component:
+```jsx
+import React from "react";
+import ReactDOM from "react-dom";
+
+class ChildComponent extends React.Component {
+    render() {
+        return (
+            <div>
+                <p>{this.props.name}</p>
+                <p>{this.props.age}</p>
+                <p>{this.props.gender}</p>
+            </div>
+        );
+    }
+}
+
+class ParentComponent extends React.Component {
+    render() {
+        return (
+            <div>
+                <ChildComponent name="John" age="30" gender="male" />
+                <ChildComponent name="Mary" age="25" gender="female" />
+            </div>
+        );
+    }
+}
+```
+
+
+
+
+
+
+# `key` prop
+The `key` prop is a special attribute that React uses to identify elements in a list. When rendering a list of elements,
+React uses the `key` prop to determine which elements have changed, are added, or are removed. The `key` prop should be
+unique for each element in the list and should not change over time.
+
+When an element is added to a list, React uses the `key` prop to determine where to insert the new element. When an
+element is removed from a list, React uses the `key` prop to identify which element to remove. When an element is
+updated in a list, React uses the `key` prop to determine which element has changed.
+
+Common misconceptions about the `key` is it needs for performance. But it is not true. The `key` prop is not used for
+performance optimization. It is used to identify elements in a list and determine which elements have changed, are added,
+or are removed.
+
+* Using *indexes* for keys is **not recommended** if the order of items may change. This can negatively impact 
+  performance and may cause issues with component state.
+* If you extract list item as separate component then apply keys on list component instead of `li` tag.
+* There will be a warning message in the console if the `key` prop is not present on list items.
+* The key attribute accepts either string or number and internally convert it as string type.
+* Don't generate the key on the fly something like `key={Math.random()}`. Because the keys will never match up between
+  re-renders and DOM created everytime.
+
+If we want to stop re-rendering we can use `React.memo`. For static array we can use `React.memo` and for `key` prop we
+use some sort of `id` or index as `key` prop.
+- If we use `id` as `key` prop, we can use `React.memo` to stop re-rendering.
+  ```jsx
+    const Form = () => {
+        const [inputs, setInputs] = useState([
+            { id: 1, placeholder: "Enter your name" },
+            { id: 2, placeholder: "Enter your email" },
+            { id: 3, placeholder: "Enter your phone number" },
+        ]);
+    
+        return (
+            <>
+                {inputs.map((input) => (
+                    <Input key={input.id} id={input.id} placeholder={input.placeholder} ... />
+                ))}
+            </>
+        )
+    }
+    
+    const Input = React.memo(({ id, placeholder }) => {
+        return (
+            <input type="text" id={id} placeholder={placeholder} />
+        );
+    });
+  ```
+- If we use index as `key` prop, we `React.memo` will not work as expected. Because the index will be changed when the
+  array is changed. So, the `key` prop will be changed and the component will be unmounted and mounted again. The state
+  will be lost and the input box will be empty
+  ```jsx
+    const Form = () => {
+        const [inputs, setInputs] = useState([
+            { id: 1, placeholder: "Enter your name" },
+            { id: 2, placeholder: "Enter your email" },
+            { id: 3, placeholder: "Enter your phone number" },
+        ]);
+    
+        return (
+            <>
+                {inputs.map((input, index) => (
+                    <Input key={index} id={input.id} placeholder={input.placeholder} ... />
+                ))}
+            </>
+        )
+    }
+
+  ```
+
+## Preventing unnecessary re-renders with React.memo
+If we want to prevent re-renders of items, we need to use `React.memo` to wrap the component.
+
+In this example, if parent component re-renders, the `InputMemo` component will not re-render if the props are the same.
+```jsx
+const data = [
+    { id: 'business', placeholder: 'Business Tax' },
+    { id: 'person', placeholder: 'Person Tax' },
+];
+
+const InputMemo = React.memo(Input);
+const Component = () => {
+    // array's index is fine here, the array is static
+    return data.map((value, index) => (
+        <InputMemo
+            key={index}
+            placeholder={value.placeholder}
+        />
+    ));
+};
+```
+
+### Swapping elements
+But with dynamic array if we sort swap the business and person tax, the `InputMemo` component will re-render. After 
+sorting the array with `key=0` and `key=1` are same type and same key but as the props `placeholder` are different for 
+first element, it changed from "Business Tax" to "Person Tax" the `InputMemo` component will re-render.
+```js
+// array before re-render
+[
+    { id: 'business', placeholder: 'Business Tax' },
+    { id: 'person', placeholder: 'Person Tax' },
+]
+// array after re-render
+[
+    { id: 'person', placeholder: 'Person Tax' },
+    { id: 'business', placeholder: 'Business Tax' },
+]
+```
+<img src="./images/fiber_diff-algorithm/key1.png" alt="key1">
+
+source: [Advanced React](https://www.advanced-react.com/)
+
+To fix this issue, we can use `id` as `key` prop. As the `id` is unique for each element, React will not re-render the
+component. The `InputMemo` component will not re-render.
+```jsx
+const data = [
+    { id: 'business', placeholder: 'Business Tax' },
+    { id: 'person', placeholder: 'Person Tax' },
+];
+
+const InputMemo = React.memo(Input);
+const Component = () => {
+    return data.map((value) => (
+        <InputMemo
+            key={value.id}
+            placeholder={value.placeholder}
+        />
+    ));
+};
+```
+If the data has nothing unique like an id , then we'd need to iterate over that array somewhere outside of the component
+that re-renders and add that id there manually.
+
+In our case of our inputs, if we use the id for key , the item with the key="business" will still have the prop
+placeholder="Business Tax" just in a different place in the array. So React will just swap the associated DOM nodes
+around, but the actual component won't rerender.
+
+<img src="./images/fiber_diff-algorithm/key2.png" alt="key2" />
+
+source: [Advanced React](https://www.advanced-react.com/)
+
+### Adding new element at the top
+If we were adding another input at the beginning of the array. If we use the array's index as key , then the item with
+the key="0" , from React's perspective, will just change its placeholder prop from "Business Tax" to "New tax"; key="1"
+item will transition from "Person Tax" to "Business Tax". So they both will re-render. And the new item with the key="2"
+and the text "Person Tax" will be mounted from scratch.
+
+<img src="./images/fiber_diff-algorithm/key3.png" alt="key3" />
+
+source: [Advanced React](https://www.advanced-react.com/)
+
+And if we use the id as a key instead, then both "Business Tax" and "Person Tax" will keep their keys, and since they
+are memoized, they won't re-render. And the new item, with the key "New tax", will be mounted from scratch.
+
+<img src="./images/fiber_diff-algorithm/key4.png" alt="key4" />
+
+source: [Advanced React](https://www.advanced-react.com/)
+
+**This technique is known as "state reset".** It is used to reset the state of the component when the component is 
+unmounted and mounted again of an uncontrolled component like input box.
+
+
+### Using "key" to force reuse of an existing element
+In this example component will be re-rendered and will unmount and mount again. The state will be lost and the input box
+will be empty.
+```jsx
+const Form = () => {
+    const [isCompany, setIsCompany] = useState(false);
+    
+    return (
+        <>
+          <Checkbox onChange={() => setIsCompany(!isCompany)} />
+          {isCompany ? <Input id="company-tax-id-number" ... /> : null}
+          {!isCompany ? <Input id="person-tax-id-number" ... /> : null}
+        </>
+    )
+}
+```
+But in this example component will be re-rendered and will not unmount and mount again. The state will be preserved and
+the input box will not be empty. Because the `key` prop is same for both components.
+```jsx
+const Form = () => {
+    const [isCompany, setIsCompany] = useState(false);
+    
+    return (
+        <>
+          <Checkbox onChange={() => setIsCompany(!isCompany)} />
+          {isCompany ? <Input id="company-tax-id-number" key="tax-input" ... /> : null}
+          {!isCompany ? <Input id="person-tax-id-number" key="tax-input"... /> : null}
+        </>
+    )
+}
+```
+Before `isCompany` is `false`
+```json
+{
+  "type": "Input",
+  "key": "tax-input",
+  "props": {
+    "id": "person-tax-id-number"
+  }
+}
+```
+After `isCompany` is `true`
+```json
+{
+  "type": "Input",
+  "key": "tax-input",
+  "props": {
+    "id": "company-tax-id-number"
+  }
+}
+```
+As the `key` prop is same, React will not unmount and mount the component. React will just re-render the component so
+the state will be preserved. The input box will not be empty.
+
+#### Why react force key only for array?
+React needs to know which elements have changed, are added, or are removed. When rendering a list of elements, React
+uses the `key` prop to determine which elements have changed, are added, or are removed. The `key` prop should be unique 
+for each element in the list and should not change over time.
+
+```jsx
+const data = ['1', '2'];
+
+const Component = () => {
+    return (
+        <>
+          {data.map((i) => (
+              <Input key={i} id={i} />
+          ))}
+          {/* will this input re-mount if I add a new item in the array above? */}
+          <Input id="3" />
+        </>
+    );
+};
+```
+We can think react will define object like this. So if we add another element then it will with key 3 and react have to
+place it after key 2.
+```jsx
+[
+    { type: Input, key: 1 }, // input from the array
+    { type: Input, key: 2 }, // input from the array
+    { type: Input }, // input after the array
+];
+```
+But this is not the case. First one is the array and the second one is the manual input. So, the manual input will not be
+unmounted and mounted again. The state will be preserved and the input box will not be empty.
+```js
+[
+    // the entire dynamic array is the first position in the children's array
+    [
+        { type: Input, key: 1 },
+        { type: Input, key: 1 },
+        { type: Input, key: 2 },
+    ],
+    {
+        type: Input, // this is our manual Input after the array
+    },
+];
+```
+
+
+
+
+
+
+
+
+
 # Render props
 A render prop is a function that returns an Element.
 
@@ -172,11 +466,11 @@ A render prop is a function that returns an Element.
 - The function is called by the component that receives the prop.
 - The function returns a React element.
 - The function can take arguments.
-- The function can return a React element.
-- The function can return a React element with props.
-- The function can return a React element with children.
+- The function can return a React element with props also with children.
 
-Sharing state is also not a problem anymore. We can simply merge that state value into the object we're passing to the icon:
+Sharing state is also not a problem anymore. We can simply merge that state value into the object we're passing to the
+icon:
+
 ```tsx
 import { ReactElement } from 'react';
 
@@ -188,6 +482,7 @@ type IconProps = {
     size?: 'large' | 'medium' | 'small';
 };
 
+// This HomeIcon is a render prop
 const HomeIcon = ({ color, size }: IconProps) => <Home style={{ color }} fontSize={size} />;
 
 type ButtonProps = {
@@ -196,6 +491,7 @@ type ButtonProps = {
     appearance?: 'primary' | 'secondary';
 };
 
+// This Button is a render prop
 const Button = ({ appearance = 'primary', size = 'normal', renderIcon }: ButtonProps) => {
     // create default props as before
     const defaultIconProps: IconProps = {
@@ -222,8 +518,8 @@ export default function App() {
     );
 }
 ```
-Another way of implementing it
-[Chapter 4. Example 2](https://www.advanced-react.com/examples/04/02)
+Another way of implementing it [Chapter 4. Example 2](https://www.advanced-react.com/examples/04/02)
+
 ```tsx
 import { ReactElement, useState } from 'react';
 
@@ -240,7 +536,9 @@ type IconState = {
   isHovered: boolean;
 };
 
+// This HomeIcon is a render prop
 const HomeIcon = ({ color, size }: IconProps) => <Home style={{ color }} fontSize={size} />;
+// This HomeOutlinedIcon is a render prop
 const HomeOutlinedIcon = ({ color, size }: IconProps) => <HomeOutlined style={{ color }} fontSize={size} />;
 
 type ButtonProps = {
@@ -282,11 +580,12 @@ export default function App() {
 A component that tracks the resize event on the browser window. But in this case both the `ResizeDetector` and the 
 component which is using it also it will need another state to store the width of the window.
 
-NOTE: I prefer to use hooks instead of render props. Also it was used by programmer before hooks were introduced 
+NOTE: I prefer to use hooks instead of render props. Also, it was used by programmer before hooks were introduced 
 in React.
 
 * Render props for configuration and flexibility use cases.
 * Before hooks, render props were used to share stateful logic between components
+
 ```tsx
 const ResizeDetector = ({ onWidthChange }) => {
     const [width, setWidth] = useState();
@@ -306,8 +605,10 @@ const ResizeDetector = ({ onWidthChange }) => {
     return ...
 }
 ```
+
 If we want to track the window size in different components without duplicating the logic, we needs to pass a state to 
 the `ResizeDetector` component but doing that we needs two state for tacking one value.
+
 ```jsx
 const ResizeDetector = ({ onWidthChange }) => {
     const [width, setWidth] = useState();
@@ -389,6 +690,7 @@ export default function App() {
   );
 }
 ```
+
 ### Replace render props with hooks
 Hooks replaced that pattern in almost 99% of cases where it was used.
 ```js
@@ -420,5 +722,7 @@ const Layout = () => {
     );
 };
 ```
+
 ### References:
 * [Advanced React](https://www.advanced-react.com/)
+* [reactjs-interview-questions - github](https://github.com/sudheerj/reactjs-interview-questions?tab=readme-ov-file#what-is-react)

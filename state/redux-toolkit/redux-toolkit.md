@@ -7,7 +7,7 @@ When using an advanced state management toolkit, handling state updates needs to
 
 ### Scenario 1: Immutable State Updates for UI Responsiveness
 
-```js
+```jsx
 updateItemAtIndex(state, action) {
     const { index, newItem } = action.payload;
     return {
@@ -29,7 +29,7 @@ updateItemAtIndex(state, action) {
 
 ### Scenario 2: Direct Assignment in State Management (Lack of UI Update)
 
-```js
+```jsx
 updateItemAtIndex(state, action) {
     const { index, newItem } = action.payload;
     if (index >= 0 && index < state.items.list.length) {
