@@ -153,10 +153,10 @@ const App = () => {
     );
 };
 ```
-In this case, the `App` component will re-render every time the modal is opened or closed. This is because the `useModalDialog`
-hook is called in the `App` component, and the state is stored in the hook itself. But we are using the `isOpen` state
-from the hook in the `App` component, so the `App` component will re-render every time the state changes. It doesn't matter
-that the state is stored in the hook; what matters is that the state is used in the `App` component.
+In this case, the `App` component will re-render every time the modal is opened or closed. This is because the 
+`useModalDialog`hook is called in the `App` component, and the state is stored in the hook itself. But we are using the
+`isOpen` state from the hook in the `App` component, so the `App` component will re-render every time the state changes. 
+It doesn't matter that the state is stored in the hook; what matters is that the state is used in the `App` component.
 
 Another think suppose we use the hook below in `App` component.
 ```jsx

@@ -835,6 +835,22 @@ Greeting.propTypes = {
 export default Greeting;
 ```
 
+## Prototype validation with `shape`
+If we pass an array of object to a component, we can use `React.PropTypes.shape()` and `React.PropTypes.arrayOf()` to
+validate the props.
+
+```jsx
+ReactComponent.propTypes = {
+  arrayWithShape: React.PropTypes.arrayOf(
+    React.PropTypes.shape({
+      color: React.PropTypes.string.isRequired,
+      fontSize: React.PropTypes.number.isRequired,
+    })
+  ).isRequired,
+};
+```
+
+
 
 
 

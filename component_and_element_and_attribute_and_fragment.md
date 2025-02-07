@@ -87,6 +87,112 @@ import { ErrorBoundary } from "react-error-boundary";
 ```
 
 
+
+# Naming a component
+* Component names should always start with a **capital letter**.
+* React treats components starting with lowercase letters as **DOM tags** means HTML tags / SVG.
+* So while started with lowercase letter, it will be treated as HTML tag and while started with uppercase letter, it will
+  be treated as React component.
+
+```jsx
+// Correct
+function Greeting() {
+  return <h1>Hello, World!</h1>;
+}
+
+// Incorrect
+function greeting() {
+  return <h1>Hello, World!</h1>;
+}
+```
+
+But we can define a component as lowercase(which is not recommended as it will create confusion) and while importing it
+we can use it as uppercase letter.
+
+```jsx
+// Define as lowercase
+function myComponent {
+  render() {
+    return <div />;
+  }
+}
+
+export default myComponent;
+```
+
+```jsx
+// Import as uppercase
+import MyComponent from "./myComponent";
+```
+
+## Exception on naming a component
+### Higher Order Component
+**Higher-Order Components (HOCs)** are an exception to this rule. They are named with a lowercase letter because they
+are not components themselves but functions that return components.
+
+**Correct**
+```jsx
+function withUser(Component) {
+  return function WithUserComponent(props) {
+    return <Component {...props} user={user} />;
+  };
+}
+```
+**Incorrect**
+```jsx
+function WithUser(Component) {
+  return function WithUserComponent(props) {
+    return <Component {...props} user={user} />;
+  };
+}
+```
+
+### Objects of Components
+When exporting an object of components, it's common to use lowercase keys for the components. This is because the object
+is a collection of components, not a single component.
+```jsx
+import React from 'react';
+
+const MyComponent = () => <div>This is MyComponent!</div>;
+const AnotherComponent = () => <div>This is AnotherComponent!</div>;
+
+const components = {
+  MyComponent: MyComponent,
+  AnotherComponent: AnotherComponent,
+};
+
+class MyParentComponent extends React.Component {
+  render() {
+    return (
+      <div>
+        <components.MyComponent /> {/* React.createElement(components.MyComponent) */}
+        <components.AnotherComponent /> {/* React.createElement(components.AnotherComponent) */}
+      </div>
+    );
+  }
+}
+
+export default function App() {
+  return (
+    <div>
+      <MyParentComponent />
+    </div>
+  );
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Pure Component in React
 
 ## What is a Pure Component?
@@ -559,8 +665,7 @@ const element = <Greeting name="Alice" />;
 ```
 
 
-
-# React `createElement` and `cloneElement`
+## React `createElement` and `cloneElement`
 
 ## `React.createElement()`
 The `React.createElement()` function is used to create a **React element** without using JSX. It takes three main
@@ -632,6 +737,81 @@ ReactDOM.render(clonedButton, document.getElementById("root"));
 
 These functions are **powerful tools** for dynamic UI creation and component manipulation in React.
 
+## `label` Element Example
+As `for` is a reserved keyword in JavaScript, we use `htmlFor` in React to associate a label with an input element.
+```jsx
+<label htmlFor="name">Name:</label>
+<input id="name" type="text" />
+```
+After converting into React element, it will be like
+```jsx
+React.createElement("label", { htmlFor: "name" }, "Name:");
+React.createElement("input", { id: "name", type: "text" });
+```
+In HTML, it will be like after converting into HTML from React element
+```html
+<label for="name">Name:</label>
+<input id="name" type="text" />
+```
+
+## State of element
+### `focus`
+The `focus` method is used to give focus to an element. It is a DOM method that can be called on a DOM node or a React
+element reference. Like if we use `focus` in a input element then it will focus on that input element when page loads.
+And if we type anything then it will be typed in that input element.
+
+#### Focus an element on load
+**Class Component**
+```jsx
+class App extends React.Component {
+  componentDidMount() {
+    this.nameInput.focus();
+  }
+
+  render() {
+    return (
+            <div>
+              <input defaultValue={"Won't focus"} />
+              <input
+                      ref={(input) => (this.nameInput = input)}
+                      defaultValue={"Will focus"}
+              />
+            </div>
+    );
+  }
+}
+
+ReactDOM.render(<App />, document.getElementById("app"));
+```
+
+**Functional Component**
+```jsx
+import React, { useEffect, useRef } from "react";
+
+const App = () => {
+  const inputElRef = useRef(null);
+
+  useEffect(() => {
+    inputElRef.current.focus();
+  }, []);
+
+  return (
+          <div>
+            <input defaultValue={"Won't focus"} />
+            <input ref={inputElRef} defaultValue={"Will focus"} />
+          </div>
+  );
+};
+
+ReactDOM.render(<App />, document.getElementById("app"));
+```
+
+
+
+
+
+
+
 
 
 
@@ -682,9 +862,101 @@ function HelloWorldComponent() {
 Style keys are camelCased in order to be consistent with accessing the properties on DOM nodes in JavaScript 
 (e.g. `node.style.backgroundImage`).
 
+### Combine multiple inline styles objects
+You can use spread operator in regular React:
+```jsx
+<button style={{ ...styles.panel.button, ...styles.panel.submitButton }}>
+    {"Submit"}
+</button>
+```
+If you're using React Native then you can use the array notation:
+```jsx
+<button style={[styles.panel.button, styles.panel.submitButton]}>
+    {"Submit"}
+</button>
+```
+
+### Vendor Prefixes in CSS
+Vendor prefixes are prefixes added to CSS properties (and sometimes other web technologies) by browser vendors (like 
+Mozilla, Google, Microsoft, etc.) to experiment with or implement new, non-standard features.  They are a way for
+browser makers to try out new CSS properties *before* they are officially standardized and supported by all browsers.
+
+**Using vendor prefixes in React inline styles:**
+```jsx
+<div
+  style={{
+    transform: "rotate(90deg)",
+    WebkitTransform: "rotate(90deg)", // note the capital 'W' here
+    msTransform: "rotate(90deg)", // 'ms' is the only lowercase vendor prefix
+  }}
+/>
+```
+* `transform: "rotate(90deg)"`: This is the standard CSS property for rotating an element. It rotates the element 90 
+  degrees clockwise.  Modern browsers should support this unprefixed version.
+* `WebkitTransform: "rotate(90deg)"`: This is the vendor-prefixed version of the transform property for browsers that
+  use the WebKit engine (like Chrome and Safari).  Older versions of these browsers might require this prefix. The 
+  Webkit prefix is capitalized in the JavaScript object because it's being used as a property name.
+* `msTransform: "rotate(90deg)"`: This is the vendor-prefixed version for Internet Explorer and older versions of 
+  Microsoft Edge.  The ms prefix is lowercase, but again, it's capitalized (msTransform) when used as a property in the
+  JavaScript object.
+
+#### Why those are not need now?
+* **Standardization**: Many CSS properties that required vendor prefixes in the past are now standardized and don't 
+  require prefixes in modern browsers.
+* **Autoprefixer**: Tools like Autoprefixer automatically add necessary vendor prefixes to your CSS during the build 
+  process, so you don't need to worry about them in your source code.
+* **Browsers**: Modern browsers have caught up with CSS standards, and many properties no longer require prefixes.
 
 
-# Fragrment
+## DOM Attributes support
+In the past, React used to ignore unknown DOM attributes. If you wrote JSX with an attribute that React doesn't
+recognize, React would just skip it.
+
+For example, let's take a look at the below attribute:
+```jsx
+<div mycustomattribute={"something"} />
+```
+Would render an empty div to the DOM with React v15:
+```jsx
+<div />
+```
+In React v16 any unknown attributes will end up in the DOM:
+```jsx
+<div mycustomattribute="something" />
+```
+This is useful for supplying browser-specific non-standard attributes, trying new DOM APIs, and integrating with 
+opinionated third-party libraries.
+
+
+## Conditionally apply class attributes
+#### Using Ternary Operator
+```jsx
+function Button({ isPrimary }) {
+  return <button className={isPrimary ? "primary" : "secondary"}>Click Me</button>;
+}
+```
+
+#### Using Logical AND Operator
+```jsx
+function Button({ isPrimary }) {
+  return <button className={isPrimary && "primary"}>Click Me</button>;
+}
+```
+
+#### Using Template Literals
+```jsx
+function Button({ isPrimary }) {
+  return <button className={`button ${isPrimary ? "primary" : "secondary"}`}>Click Me</button>;
+}
+```
+
+
+
+
+
+
+
+# Fragment
 A **Fragment** is a built-in component in React that allows you to group multiple children without adding extra nodes to
 the DOM. We can use `<Fragment></Fragment>` or `<> </>` to wrap multiple elements.
 

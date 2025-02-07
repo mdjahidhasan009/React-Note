@@ -51,7 +51,38 @@ const Button = React.createClass({
 });
 ```
 
+## React vs ReactDOM
 
+The `react` package contains `React.createElement()`, `React.Component`, `React.Children`, and other helpers related to
+elements and component classes. These are the isomorphic or universal helpers needed to build components.
+
+The `react-dom` package contains `ReactDOM.render()`, and in `react-dom/server`, we have server-side rendering support 
+with `ReactDOMServer.renderToString()` and `ReactDOMServer.renderToStaticMarkup()`.
+
+---
+
+## Why ReactDOM is separated from React?
+
+The React team extracted all DOM-related features into a separate library called `ReactDOM`. React v0.14 was the first
+release where the libraries were split.
+
+By looking at some of the packages like `react-native`, `react-art`, `react-canvas`, and `react-three`, it became clear
+that the essence of React is not tied to browsers or the DOM.
+
+To support rendering in multiple environments, the React team split the main React package into two: `react` and
+`react-dom`. This allows developers to write components that can be shared between the web version of React and React
+Native.
+
+
+## Get react version at runtime
+```jsx
+const REACT_VERSION = React.version;
+
+ReactDOM.render(
+  <div>{`React version: ${REACT_VERSION}`}</div>,
+  document.getElementById("app")
+);
+```
 
 
 ### References
