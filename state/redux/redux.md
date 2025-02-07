@@ -5,7 +5,7 @@ uses this pattern internally when working with React.
 
 The workflow between dispatcher, stores and views components with distinct inputs and outputs as follows:
 
-<img src="./images/flux.png" alt="flux" />
+<img src="images/flux.png" alt="flux" />
 
 Source: [reactjs-interview-questions - github](https://github.com/sudheerj/reactjs-interview-questions)
 
@@ -52,6 +52,56 @@ Instead of saying downsides, we can say that there are a few compromises of usin
   example, excessive re-renders due to unnecessary component updates can impact performance.  Proper use of memoization
   techniques and `shouldComponentUpdate` (or its equivalents) is crucial for optimizing Redux applications.
 
+
+## Adding Multiple Middlewares to Redux
+
+To add multiple middlewares to your Redux store, use the `applyMiddleware()` function.  Pass the desired middlewares as 
+arguments to `applyMiddleware()`.
+
+**Example:**
+
+```javascript
+import { createStore, applyMiddleware } from "redux";
+import ReduxThunk from 'redux-thunk'; // Example middleware
+import logger from 'redux-logger'; // Another example middleware
+
+const createStoreWithMiddleware = applyMiddleware(
+        ReduxThunk,
+        logger // Add other middlewares here
+)(createStore);
+
+// Now use createStoreWithMiddleware instead of createStore when creating your store.
+const store = createStoreWithMiddleware(rootReducer); // Assuming rootReducer is defined.
+```
+
+## Setting the Initial State in Redux
+Set the initial state of your Redux store by passing it as the second argument to createStore().
+
+Example:
+
+```js
+import { createStore, combineReducers } from 'redux';
+
+const rootReducer = combineReducers({
+  todos: todosReducer, // Your reducers
+  visibilityFilter: visibilityFilterReducer,
+  // ... other reducers
+});
+
+const initialState = {
+  todos: [{ id: 123, name: "example", completed: false }],
+  visibilityFilter: 'SHOW_ALL' // Example initial state
+};
+
+const store = createStore(rootReducer, initialState);
+```
+
+**Explanation:**
+
+* The `initialState` object defines the initial values for the different parts of your Redux state tree.  The keys in 
+  this object should match the keys used in your `combineReducers()` call.
+* `createStore(rootReducer, initialState)`: This creates the Redux store, using `rootReducer` to handle state updates 
+  and initializing the state with `initialState`.
 
 
 ## Accessing the Redux Store Outside a Component
@@ -236,6 +286,102 @@ function MyComponent {
   }
 }
 ```
+
+
+## Redux Selectors: Deriving and Memoizing State
+
+Redux selectors are functions that take the Redux state as an argument and return specific data to be used by components.  They provide a way to encapsulate the logic for accessing and transforming state, offering several key benefits.
+
+**Basic Example:**
+
+```javascript
+const getUserData = (state) => state.user.data;
+```
+This simple selector retrieves user data from the state.
+
+### Benefits of Using Selectors
+
+Selectors offer two primary advantages:
+**Deriving Data:** Selectors can compute derived data, allowing Redux to store only the minimal necessary state. For 
+example, you might store a list of items and a filter, and then use a selector to derive the *visible* items:
+```javascript
+const getVisibleTodos = (state) => {
+  const { todos, visibilityFilter } = state;
+  switch (visibilityFilter) {
+    case 'SHOW_ALL':
+      return todos;
+    case 'SHOW_COMPLETED':
+      return todos.filter(t => t.completed);
+    case 'SHOW_ACTIVE':
+      return todos.filter(t => !t.completed);
+    default:
+      return todos;
+  }
+};
+```
+Storing only the `todos` and `visibilityFilter` and deriving the visible todos with a selector keeps the state minimal
+and avoids redundant data.
+
+**Memoization (Performance Optimization):** Selectors are not recomputed unless one of their arguments (usually the
+state) changes. This is achieved through memoization. If the input state hasn't changed, the selector will return the
+cached result, avoiding unnecessary recalculations. This can significantly improve performance, especially when dealing 
+with complex calculations or large datasets. Libraries like `reselect` make it easy to create memoized selectors.
+
+**Example with `reselect`:**
+```js
+import { createSelector } from 'reselect';
+
+const getTodos = (state) => state.todos;
+const getVisibilityFilter = (state) => state.visibilityFilter;
+
+const getVisibleTodos = createSelector(
+  [getTodos, getVisibilityFilter], // Input selectors (dependencies)
+  (todos, visibilityFilter) => {      // Output selector (computes derived data)
+    switch (visibilityFilter) {
+      case 'SHOW_ALL':
+        return todos;
+      case 'SHOW_COMPLETED':
+        return todos.filter(t => t.completed);
+      case 'SHOW_ACTIVE':
+        return todos.filter(t => !t.completed);
+      default:
+        return todos;
+    }
+  }
+);
+```
+In this `reselect` example, `getVisibleTodos` is a memoized selector. It will only recompute the visible todos if either
+the `todos` or `visibilityFilter` parts of the state have changed.
+
+**Further Benefits:**
+* **Abstraction:** Selectors abstract the way state is accessed, making your components less dependent on the specific 
+  structure of the state. If the state structure changes, you only need to update the selectors, not every component
+  that uses the data.
+* **Testability:** Selectors are easily testable. You can write unit tests to ensure they correctly derive data from the
+  state.
+* **Reusability:** Selectors can be reused across multiple components.
+
+By using selectors, you can keep your components lean, improve performance through memoization, and make your Redux code
+more maintainable and testable.
+
+
+## Actions in Redux
+
+Actions are plain JavaScript objects that carry information (or payloads) from your application to the Redux store. They
+are the *only* way to update the store's state.  Every action *must* have a `type` property, which is a string constant
+indicating the type of action being performed.
+
+**Example: Adding a Todo Item**
+
+```javascript
+{
+  type: ADD_TODO, // String constant defining action type
+          text: 'Add todo item' // Payload with todo text
+}
+```
+The `type` property is crucial; it's what reducers use to determine how to update the state.  The rest of the action 
+object (the payload) can contain any data needed to perform the update.
+
 
 ## The Purpose of Constants in Redux
 
@@ -437,6 +583,41 @@ Redux internally wraps this object shorthand in a function similar to: `(...args
 This wrapper function is then passed as a prop to your component. This shorthand makes your code cleaner and easier to 
 read.
 
+
+**Different ways to write mapDispatchToProps():**
+
+There are a few ways of binding action creators to dispatch() in mapDispatchToProps(). Below are the possible options:
+```jsx
+const mapDispatchToProps = (dispatch) => ({
+  action: () => dispatch(action()),
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  action: bindActionCreators(action, dispatch),
+});
+
+const mapDispatchToProps = { action }; // Shorthand for the first option
+```
+
+**Use of the ownProps parameter:**
+
+If the ownProps parameter is specified, React Redux will pass the props that were passed to the connected component into
+your connect functions. So, if you use a connected component:
+
+```jsx
+import ConnectedComponent from "./containers/ConnectedComponent";
+<ConnectedComponent user={"john"} />;
+```
+The `ownProps` inside your `mapStateToProps()` and `mapDispatchToProps()` functions will be an object:
+```js
+{
+  user: "john"
+}
+```
+You can use this object to decide what to return from those functions.
+
+**Key Differences Summarized:**
+
 | Feature          | `mapStateToProps()`                               | `mapDispatchToProps()`                                  |
 |------------------|---------------------------------------------------|---------------------------------------------------------|
 | Purpose          | Maps state to props                               | Maps dispatch to props                                  |
@@ -445,6 +626,36 @@ read.
 | When Called      | When state changes                                | Initially and potentially when props change             |
 | Use Cases        | Accessing data from the store                     | Dispatching actions to update the store                 |
 | Shorthand        | Not applicable                                    | Recommended when passing action creators directly       |
+
+
+
+
+
+## Structuring Redux Top-Level Directories
+A common and effective way to structure Redux applications involves organizing files into top-level directories.A 
+typical structure looks like this:
+* **`components`:** Contains presentational (or "dumb") components. These components are UI-focused and unaware of 
+  Redux. They receive data and callbacks as props.
+* **`containers`:** Contains container (or "smart") components. These components are connected to the Redux store using
+  `connect()` (or hooks). They subscribe to Redux state updates, dispatch actions, and pass data and callbacks as props 
+  to presentational components.
+* **`actions`:** Holds all action creators. Files within this directory often correspond to specific parts of the
+  application's functionality.
+* **`reducers`:** Contains all reducers.  Files are usually named to match the corresponding keys in the application's
+  state tree.
+* **`store`:**  Contains the code for initializing the Redux store.
+
+### Components vs. Containers in React-Redux
+
+* **Component:** A component (functional or class-based) that focuses on the presentation of UI elements. It is unaware 
+  of Redux and receives data and event handlers as props.  It is often reusable.
+* **Container:** A component that is connected to the Redux store.  It uses `connect()` (or hooks) to subscribe to 
+  relevant parts of the state and dispatch actions.  Containers often act as intermediaries, fetching data, transforming
+  it if necessary, and passing it down as props to presentational components.  They often do not render any DOM 
+  themselves, but rather delegate the rendering to the components they wrap.
+
+
+
 
 
 
@@ -479,8 +690,10 @@ import { combineReducers } from 'redux';
 import storage from 'redux-persist/lib/storage'; // If using redux-persist
 
 // Individual reducers (example)
-const userReducer = (state = { name: null }, action) => { /* ... */ };
-const itemsReducer = (state = [], action) => { /* ... */ };
+const userReducer = (state = {name: null}, action) => { /* ... */
+};
+const itemsReducer = (state = [], action) => { /* ... */
+};
 
 // Combine reducers
 const appReducer = combineReducers({
@@ -494,9 +707,9 @@ const rootReducer = (state, action) => {
   if (action.type === 'USER_LOGOUT') {
     // For redux-persist: Clear persisted state
     if (state) { // Check if state exists to avoid errors on initial load
-        Object.keys(state).forEach(key => {
-            storage.removeItem(`persist:${key}`);
-        });
+      Object.keys(state).forEach(key => {
+        storage.removeItem(`persist:${key}`);
+      });
     }
 
     state = undefined; // This triggers reducers to return their initial state
@@ -658,6 +871,36 @@ higher-level abstraction for state management.
 
 
 
+## Redux DevTools: A Time-Traveling Debugger for Redux
+Redux DevTools is a powerful debugging tool for Redux applications. It provides a live-editing, time-travel debugging 
+environment with features like hot reloading, action replay, and a customizable UI.  For ease of use, the Redux DevTools 
+Extension for Chrome and Firefox is a popular choice, simplifying integration into your project.
+
+## Features of Redux DevTools
+
+Redux DevTools offers a range of features to enhance the debugging experience:
+
+* **State and Action Inspection:**  Inspect every state update and the corresponding action payload that caused the
+  change.  This allows you to see exactly how your application's state is evolving over time.
+* **Time Travel Debugging (Action Replay):**  Go back in time by "canceling" (or "reverting") actions. This lets you see
+  what your application state was at any point in the past, making it easier to pinpoint the source of bugs.
+* **Hot Reloading with Action Re-evaluation:** If you modify your reducer code, Redux DevTools will re-evaluate each
+  "staged" action, allowing you to see the effect of your code changes on the application's state without having to
+  manually replay the actions.
+* **Error Detection:** If a reducer throws an error, Redux DevTools will show you exactly which action caused the error 
+  and what the error message was. This greatly simplifies the process of tracking down reducer-related bugs.
+* **Persistent Debug Sessions:** Using the `persistState()` store enhancer, you can save your debugging sessions across 
+  page reloads.  This is incredibly useful for debugging complex issues that might take multiple sessions to track down.
+
+**Further Enhancements and Considerations:**
+* **Customizable UI:** Redux DevTools offers a customizable UI, allowing you to tailor the debugging experience to your
+  preferences.
+* **Integration with other tools:** Redux DevTools can often be integrated with other debugging and profiling tools.
+* **Performance considerations:** While generally performant, using Redux DevTools in production might have a small
+  performance overhead.  It's best practice to disable it in production builds.
+* **Advanced features:**  Redux DevTools offers more advanced features like filtering actions, importing/exporting 
+  state, and more, which can further streamline the debugging process.
+
 
 
 
@@ -684,12 +927,6 @@ It's crucial to remember that the similarities are high-level.  Redux is primari
 (often UI), while RxJS is a library for reactive programming, primarily for handling asynchronous operations and event
 streams.  They are often used together, with RxJS handling asynchronous actions and Redux managing the resulting state 
 updates.
-
-
-
-
-
-
 
 ### References
 * [reactjs-interview-questions - github](https://github.com/sudheerj/reactjs-interview-questions)
