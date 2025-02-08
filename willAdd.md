@@ -38,3 +38,10 @@
 # Interview Questions
 * [reactjs-interview-questions - github](https://github.com/sudheerj/reactjs-interview-questions) from 140 to last added
   from 1 to 139 are already added in this repo
+  * But added those after 140 
+    * 150, 151
+    * 163, 174
+    * 195
+    * 202, 203, 218, 253, 254, 268
+  * Old Q&A does not add any except those below
+    * 10, 11, 23

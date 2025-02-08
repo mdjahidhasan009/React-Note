@@ -7,6 +7,8 @@ available for many programming languages. Here are some popular linters:
 * [TSLint](https://palantir.github.io/tslint/): A linter for TypeScript.
 * [eslint-plugin-react](https://www.npmjs.com/package/eslint-plugin-react): Additional ESLint rules for React.
 * [eslint-plugin-jsx-a11y](https://www.npmjs.com/package/eslint-plugin-jsx-a11y): Accessibility rules for JSX.
+* [eslint-plugin-react-hooks](https://www.npmjs.com/package/eslint-plugin-react-hooks): Additional ESLint rules for
+  React hooks.
 
 
 ### References

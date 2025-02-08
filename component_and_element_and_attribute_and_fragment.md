@@ -86,6 +86,11 @@ import { ErrorBoundary } from "react-error-boundary";
 </ErrorBoundary>;
 ```
 
+#### When error boundary does not catch error
+* Inside event handlers
+* Asynchronous code (e.g., `setTimeout` or `requestAnimationFrame` callbacks)
+* During server-side rendering
+* In the error boundary itself
 
 
 # Naming a component

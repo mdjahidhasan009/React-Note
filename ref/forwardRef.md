@@ -77,6 +77,11 @@ export default RefAttaching;
 ```
 
 # ForwardRef
+
+`forwardRef` lets your component expose a DOM node of child component to the parent component using `ref`. It is a
+higher-order component that allows you to access the `ref` object of the child component. It is used to pass the ref 
+through the component to the DOM node.
+
 To attach ref to the functional component we need to use forwardRef. In the below example, `inputRef.current` will have 
 all the properties of the html input element.
 ```jsx

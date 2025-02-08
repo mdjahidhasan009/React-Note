@@ -47,9 +47,9 @@ const submit = useMemo(() => {
 
 # React.memo
 `React.memo` is a higher-order component that memorizes the component. It's similar to `PureComponent` but for 
-functional components. It's used to prevent unnecessary re-renders of a component by memorizing the component's props. 
-When the parent component re-renders, `React.memo` will compare the previous and current props. If the props have not 
-changed, the component will not re-render. Similarly, the component under it will not re-render. **It's similar to 
+functional components. It's used to **prevent unnecessary re-renders of a component** by memorizing the component's 
+props. When the parent component re-renders, `React.memo` will compare the previous and current props. If the props have 
+not changed, the component will not re-render. Similarly, the component under it will not re-render. **It's similar to 
 `shouldComponentUpdate` in class components.**
 
 ## Basic Usage
