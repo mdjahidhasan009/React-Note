@@ -35,6 +35,12 @@
 * [Profy dev](https://www.youtube.com/@profydev)
 
 
+# Pattern
+* For form
+  * Render props
+  * Component Compound
+  * Function Children
+
 # Interview Questions
 * [reactjs-interview-questions - github](https://github.com/sudheerj/reactjs-interview-questions) from 140 to last added
   from 1 to 139 are already added in this repo
