@@ -285,7 +285,8 @@ export function show(id) { dispatch(showModal(modalId, args)) }
 export function hide() { dispatch(hideModal(modalId, args)) }
 ```
 <details>
-  <summary>Explanation of the implementation</summary>
+<summary>Explanation of the implementation</summary>
+
 It's defines a provider to wrap the root component,
 ```jsx
 return (
@@ -326,6 +327,7 @@ reducer actions. They will be passed via the context to the individual child com
 export function show(id) { dispatch(showModal(modalId, args)) }
 export function hide() { dispatch(hideModal(modalId, args)) }
 ```
+---------
 </details>
 
 ### How can we invoke the modal

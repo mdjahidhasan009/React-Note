@@ -153,8 +153,7 @@ export default function App() {
   );
 }
 ```
-While this approach works pretty well for simple cases, it is not that
-good for something more complicated.
+While this approach works pretty well for simple cases, it is not that good for something more complicated.
 
 
 Example in class component:
@@ -662,7 +661,7 @@ const ResizeDetector = ({ onWidthChange }) => {
 }
 ```
 
-If we want to track the window size in different components without duplicating the logic, we needs to pass a state to 
+If we want to track the window size in different components without duplicating the logic, we need to pass a state to 
 the `ResizeDetector` component but doing that we needs two state for tacking one value.
 
 ```jsx

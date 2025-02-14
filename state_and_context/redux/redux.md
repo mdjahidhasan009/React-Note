@@ -253,7 +253,10 @@ component state for data that is local to a component and related to its UI.
 
 ## Accessing the Redux Store: The Preferred Way
 
-The best way to access the Redux store within a React component is by using the `connect()` function (or the more modern hooks, `useSelector` and `useDispatch`, which are built upon `connect` internally). `connect()` creates a new component that wraps around your existing one, a pattern called Higher-Order Components. This allows you to map parts of the Redux state and action creators to your component's props, which are then passed in automatically as the store updates.
+The best way to access the Redux store within a React component is by using the `connect()` function (or the more modern 
+hooks, `useSelector` and `useDispatch`, which are built upon `connect` internally). `connect()` creates a new component 
+that wraps around your existing one, a pattern called Higher-Order Components. This allows you to map parts of the Redux 
+state and action creators to your component's props, which are then passed in automatically as the store updates.
 
 **Example using `connect()`:**
 

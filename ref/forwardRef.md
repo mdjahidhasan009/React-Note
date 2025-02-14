@@ -1,6 +1,6 @@
 # HTML Element
-We can use `useRef` hook to attach ref to the DOM element. So `inputRef.current` will have all
-the properties of the html input element.
+We can use `useRef` hook to attach ref to the DOM element. So `inputRef.current` will have all the properties of the 
+html input element.
 ```jsx
 import { useRef, useEffect } from "react";
 
@@ -19,10 +19,13 @@ function RefAttaching() {
 export default RefAttaching;
 ```
 
+
+
+
 # Class Component
-In class component useRef will attach the ref to the instance of the class. So `inputRef.current` will have all the internal
-methods and properties of the class. In the below example, `inputRef.current.internalMethod()` will log the message from the
-child component.
+In class component useRef will attach the ref to the instance of the class. So `inputRef.current` will have all the
+internal methods and properties of the class. In the below example, `inputRef.current.internalMethod()` will log the 
+message from the child component.
 ```jsx
 import { useRef, useEffect, Component } from "react";
 
@@ -50,6 +53,9 @@ function RefAttaching() {
 export default RefAttaching;
 ```
 
+
+
+
 # Functional Component
 In functional component, we can't attach ref to the functional component directly. We need to use forwardRef to attach ref to the
 functional component. And `inputRef.current` always will be `null`.But we can attach ref to the html element inside the functional component as we did in the first example.
@@ -75,6 +81,9 @@ function RefAttaching() {
 
 export default RefAttaching;
 ```
+
+
+
 
 # ForwardRef
 

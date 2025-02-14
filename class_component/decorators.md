@@ -1,7 +1,8 @@
 # Decorators in React (and JavaScript)
 
 Decorators are a way to wrap a function or class with another function, effectively modifying its behavior. In React, 
-decorators are often used to enhance class components, providing a clean and readable way to add functionality.
+decorators are often used to enhance class components, providing a clean and readable way to add functionality like
+Higher Order Components (HOCs) or context.
 
 **What are Decorators?**
 

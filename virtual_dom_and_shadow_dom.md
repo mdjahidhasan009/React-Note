@@ -20,11 +20,19 @@ Reconciliation is the process through which React updates the DOM. When a compon
 virtual DOM tree. Then, React compares the new virtual DOM tree with the old one and figures out what has changed. 
 Finally, React updates the real DOM to match the new virtual DOM tree.
 
+## Old reconciliation 
+Before fiber, stack reconciler was used. The stack reconciler is a recursive algorithm that traverses the virtual DOM
+tree and compares the new virtual DOM tree with the old one. The stack reconciler is a synchronous process that blocks
+the main thread and can cause performance issues. But with the introduction of fiber, the reconciliation process is
+asynchronous and non-blocking which is more efficient and improves performance specially for animations and gestures.
+
 ## Diffing Algorithm
 When a component's state changes, React updates the virtual DOM tree. Then, React compares the new virtual DOM tree with
 the old one and figures out what has changed using diffing algorithm so that component update are predictable and 
 faster.
 
+### Reconcialiation and Diffing
+Reconciliation is the process by which React updates the DOM to match the most recent component tree, ensuring efficient rendering. The diffing algorithm is a key part of reconciliation that determines what has changed in the virtual DOM by comparing the new and old component trees. React's diffing algorithm uses a heuristic approach to optimize updates: it assumes elements of different types will produce different trees, so it replaces them entirely, and for elements of the same type, it updates only the changed attributes or children. This minimizes direct DOM manipulations, improving performance. In summary, reconciliation is the overall process, while the diffing algorithm is the specific mechanism React uses to identify and apply changes efficiently.
 
 
 
