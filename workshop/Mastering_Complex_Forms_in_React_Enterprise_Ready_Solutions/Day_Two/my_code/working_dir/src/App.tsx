@@ -1,5 +1,5 @@
 import './App.css'
-import {Playground2} from "@/features/Playground/Playground2.tsx";
+import {Playground} from "@/features/Playground/Playground.tsx";
 
 // const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -35,8 +35,7 @@ function App() {
 
             <div className="max-w-2xl mt-10">
                 {/*<SemiComplexForm />*/}
-                {/*<Playground />*/}
-                <Playground2 />
+                <Playground />
 
 
                 {/*/!*Example of using input component which is not present in the generic form*!/*/}
