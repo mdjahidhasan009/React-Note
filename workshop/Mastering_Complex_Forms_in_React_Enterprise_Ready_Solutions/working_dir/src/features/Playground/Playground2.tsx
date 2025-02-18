@@ -5,7 +5,7 @@ export const Playground2 = () => {
         <Stepper>
             <Stepper.Step>Step One</Stepper.Step>
             <Stepper.Step>Two</Stepper.Step>
-            <Stepper.Step>
+            <Stepper.Step validate={() => ({ hasError: false })}>
                 <div>Three</div>
                 <div>Four</div>
             </Stepper.Step>

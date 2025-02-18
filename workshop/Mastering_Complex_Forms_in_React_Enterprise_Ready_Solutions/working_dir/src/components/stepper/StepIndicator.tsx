@@ -1,19 +1,29 @@
 import { cn } from '@/lib/utils';
-import { Check } from 'lucide-react';
-
+import { AlertCircle, Check } from 'lucide-react';
+import type { TStepError} from "./stepper.context.tsx";
 
 type TStepIndicatorProps = {
     step: number;
+    error?: TStepError;
     isActive: boolean;
     isCompleted: boolean;
 }
 
 export const StepIndicator = ({
     step,
+    error,
     isActive,
     isCompleted
 }: TStepIndicatorProps) => {
     const baseClassName = 'w-8 h-8 rounded-full flex items-center justify-center border-2 shrink-0';
+
+    if(error?.hasError) {
+        return (
+            <div className={cn(baseClassName, 'border-destructive text-destructive')}>
+                <AlertCircle className="w-4 h-4" aria-label="Error" />
+            </div>
+        )
+    }
 
     if(isCompleted) {
         return (
@@ -46,3 +56,5 @@ export const StepConnector = ({ isCompleted } : { isCompleted: boolean }) => (
         role="separator"
     />
 );
+
+StepConnector.displayName = 'StepConnector';
