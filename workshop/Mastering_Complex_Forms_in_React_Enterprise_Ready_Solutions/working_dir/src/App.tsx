@@ -1,5 +1,5 @@
 import './App.css'
-import {Playground2} from "@/features/Playground/Playground2.tsx";
+import {Playground3} from "@/features/Playground/Playground3.tsx";
 
 // const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -29,14 +29,14 @@ function App() {
   return (
     <div className="min-h-screen w-full">
         <div className="container mx-auto py-4">
-            <h1 className="text-4xl font-bold text-poppins">
-                Mastering Complex Forms
-            </h1>
+            {/*<h1 className="text-4xl font-bold text-poppins">*/}
+            {/*    Mastering Complex Forms*/}
+            {/*</h1>*/}
 
             <div className="max-w-2xl mt-10">
                 {/*<SemiComplexForm />*/}
                 {/*<Playground />*/}
-                <Playground2 />
+                <Playground3 />
 
 
                 {/*/!*Example of using input component which is not present in the generic form*!/*/}

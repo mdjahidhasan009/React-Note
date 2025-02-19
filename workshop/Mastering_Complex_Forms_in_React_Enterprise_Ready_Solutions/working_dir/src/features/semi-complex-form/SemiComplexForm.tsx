@@ -109,7 +109,7 @@ export const SemiComplexForm = ({ initialValues } : FormProps) => {
                                 <FormLabel>Gender</FormLabel>
                                 <FormControl>
                                     <RadioGroup
-                                        onValueChange={field.onChange}
+                                        onValueChange={field.onChange} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
