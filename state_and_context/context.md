@@ -2,8 +2,15 @@
 Context provides a way to pass data through the component tree without having to pass props down manually at every level.
 
 ## When to Use Context
-Context is designed to share data that can be considered "global" for a tree of React components, such as the current
-authenticated user, theme, or preferred language.
+Context is designed to share data that can be considered "global" for a tree of React components. When we use context if the data change inside of the context then the
+all children of that context will re-rendered. So we should use context when the data is not changed frequently, and in 
+those place where if the data change we need to rerender almost whole application. So we can use it for
+
+* Authentication status of the user
+* Theme
+* Preferred language
+
+As if any of those data change then we need to re-render almost whole application. So we can use context for those data.
 
 ---
 
