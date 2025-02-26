@@ -522,5 +522,41 @@ export default function App() {
 }
 ```
 
+
+
+## Render Hijacking in React
+
+The concept of render hijacking is the ability to control what a component will output from another component. It means 
+that you decorate your component by wrapping it into a Higher-Order component (HOC). By wrapping, you can inject
+additional props or make other changes, which can cause changing logic of rendering. It does not actually enable 
+hijacking, but by using HOC you make your component behave differently.
+
+### Example:
+
+```jsx
+import React from 'react';
+
+const withRenderHijack = (WrappedComponent) => {
+  return class extends React.Component {
+    render() {
+      // Modify props or behavior here
+      const newProps = { extraProp: 'This is an injected prop' };
+      return <WrappedComponent {...this.props} {...newProps} />;
+    }
+  };
+};
+
+const SimpleComponent = (props) => {
+  return <div>{props.extraProp}</div>;
+};
+
+const EnhancedComponent = withRenderHijack(SimpleComponent);
+
+export default EnhancedComponent;
+```
+
+In this example, `withRenderHijack` is a Higher-Order Component that wraps `SimpleComponent` and injects an additional
+prop, modifying its behavior dynamically.
+
 ### Source:
 * [Advanced React](https://www.advanced-react.com/)
