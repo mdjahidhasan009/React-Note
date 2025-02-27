@@ -1,16 +1,22 @@
 # Lazy Function
 The `React.lazy` function lets you render a dynamic import as a regular component. This helps you to load components
-only when they are needed.
+only when they are needed. It also will not load `<OtherComponent />` until `MyComponent` is rendered.
 
 Syntax:
 ```jsx
-export default MyComponent = return (
-  <div>
-    <h1>My Component</h1>
-  </div>
-);
+function MyComponent () {
+    return (
+        <div>
+            <h1>My Component</h1>
+            <OtherComponent />
+        </div>
+    );
+}
 
+export default MyComponent;
+```
 
+```jsx
 const MyComponent = React.lazy(() => import('./MyComponent'));
 ```
 

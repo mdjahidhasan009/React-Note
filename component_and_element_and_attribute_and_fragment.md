@@ -86,11 +86,37 @@ import { ErrorBoundary } from "react-error-boundary";
 </ErrorBoundary>;
 ```
 
-#### When error boundary does not catch error
+### When error boundary does not catch error
 * Inside event handlers
 * Asynchronous code (e.g., `setTimeout` or `requestAnimationFrame` callbacks)
 * During server-side rendering
 * In the error boundary itself
+
+**As of React 16, errors that were not caught by any error boundary will result in unmounting of the whole React
+component tree.** Because in a product like Messenger leaving the broken UI visible could lead to somebody sending a
+message to the wrong person. Similarly, it is worse for a payments app to display a wrong amount than to render nothing.
+
+### Where needs to put ErrorBoundary
+* Put the ErrorBoundary component at the top of the component tree to catch errors in any child component.
+* You can also wrap individual components with ErrorBoundary to catch errors in specific parts of the UI.
+
+### Component Stack Trace at error boundary
+Apart from error messages and javascript stack, React16 will display the component stack trace with file names and line
+numbers using error boundary concept. 
+
+Example
+```
+►React caught an error thrown by BuggyCounter. You should fix this error in your code.                           react-dom.development.js:7708
+React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary.
+
+Error: I crashed!
+
+The error is located at:             in BuggyCounter (at App.js:26)
+                                     in ErrorBoundary (at App.js:21)
+
+                                     in div (at App.js:8)
+                                     in App (at index.js:5)
+```
 
 
 # Naming a component
@@ -586,6 +612,26 @@ Page.propTypes = {
 ```
 
 
+## `displayName` Property
+The displayName in react is used to assign a custom name to a component for debugging purposes. It is a special 
+property that helps in observing the component tree in developer tools by changing the default names to custom names.
+
+```js
+function withSubscription(WrappedComponent) {
+  class WithSubscription extends React.Component {
+    /* ... */
+  }
+  WithSubscription.displayName = `WithSubscription(${getDisplayName(
+    WrappedComponent
+  )})`;
+  return WithSubscription;
+}
+function getDisplayName(WrappedComponent) {
+  return (
+    WrappedComponent.displayName || WrappedComponent.name || "Component"
+  );
+}
+```
 
 
 

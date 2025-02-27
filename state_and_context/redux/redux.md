@@ -9,7 +9,15 @@ The workflow between dispatcher, stores and views components with distinct input
 
 Source: [reactjs-interview-questions - github](https://github.com/sudheerj/reactjs-interview-questions)
 
-
+| Feature          | Flux                               | Redux                               |
+| :--------------- | :--------------------------------- | :---------------------------------- |
+| State            | Mutable                            | Immutable                           |
+| Store and Logic  | Store contains state & change logic| Store & change logic are separate   |
+| Store Count      | Multiple stores exist              | Only one store exists               |
+| Store Structure  | Disconnected & flat                | Single store, hierarchical reducers |
+| Dispatcher       | Singleton dispatcher               | Singleton dispatcher                |
+| Dispatcher absence| No dispatcher concept             | N/A                                  |
+| React Integration| Components subscribe to store     | Container components use `connect`  |
 
 
 # Redux
