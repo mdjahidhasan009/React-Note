@@ -170,5 +170,56 @@ reserved for situations where immediate DOM updates are absolutely necessary.
 
 
 
+# reselect
+Reselect is a selector library (for Redux) which uses memoization concept. It was originally written to compute derived
+data from Redux-like applications state, but it can't be tied to any architecture or library.
+
+Reselect keeps a copy of the last inputs/outputs of the last call, and recomputes the result only if one of the inputs
+changes. If the same inputs are provided twice in a row, Reselect returns the cached output. It's memoization and cache
+are fully customizable.
+
+**React Toolkit also includes a `createSelector` function that is based on Reselect.**
+
+* Selectors can compute derived data, allowing Redux to store the minimal possible state.
+* Selectors are efficient. A selector is not recomputed unless one of its arguments changes.
+* Selectors are composable. They can be used as input to other selectors.
+
+```js
+import { createSelector } from "reselect";
+
+const shopItemsSelector = (state) => state.shop.items;
+const taxPercentSelector = (state) => state.shop.taxPercent;
+
+const subtotalSelector = createSelector(shopItemsSelector, (items) =>
+  items.reduce((acc, item) => acc + item.value, 0)
+);
+
+const taxSelector = createSelector(
+  subtotalSelector,
+  taxPercentSelector,
+  (subtotal, taxPercent) => subtotal * (taxPercent / 100)
+);
+
+export const totalSelector = createSelector(
+  subtotalSelector,
+  taxSelector,
+  (subtotal, tax) => ({ total: subtotal + tax })
+);
+
+let exampleState = {
+  shop: {
+    taxPercent: 8,
+    items: [
+      { name: "apple", value: 1.2 },
+      { name: "orange", value: 0.95 },
+    ],
+  },
+};
+
+console.log(subtotalSelector(exampleState)); // 2.15
+console.log(taxSelector(exampleState)); // 0.172
+console.log(totalSelector(exampleState)); // { total: 2.322 }
+```
+
 ### References
 * [reactjs-interview-questions - github](https://github.com/sudheerj/reactjs-interview-questions?tab=readme-ov-file#what-is-react)

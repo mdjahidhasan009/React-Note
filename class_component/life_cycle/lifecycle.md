@@ -1,5 +1,11 @@
 # Class Component Lifecycle
 
+3 phases of the component lifecycle:
+
+1. **Mounting**: The component is ready to mount in the browser DOM. This phase covers initialization from `constructor()`, `getDerivedStateFromProps()`, `render()`, and `componentDidMount()` lifecycle methods.
+2. **Updating**: In this phase, the component gets updated in two ways: sending the new props and updating the state either from `setState()` or `forceUpdate()`. This phase covers `getDerivedStateFromProps()`, `shouldComponentUpdate()`, `render()`, `getSnapshotBeforeUpdate()`, and `componentDidUpdate()` lifecycle methods.
+3. **Unmounting**: In this last phase, the component is not needed and gets unmounted from the browser DOM. This phase includes the `componentWillUnmount()` lifecycle method.
+
 ## `componentDidMount`
 Called after the component is mounted to the DOM. This is a good place to make network requests or initialize the state
 of the component.
@@ -11,6 +17,18 @@ componentDidMount() {
     .then(response => response.json())
     .then(data => this.setState({ data }));
 }
+```
+
+At functional component, but in class component `componentDidMount` only runs once after the first render. But in 
+functional component, `useEffect` runs after every render. To mimic `componentDidMount` in functional component, you can
+use an empty dependency array `[]` to ensure the effect runs only once.
+```jsx
+useEffect(() => {
+  // Make a network request
+  fetch("https://api.example.com/data")
+    .then(response => response.json())
+    .then(data => setData(data));
+}, []); // Empty dependency array ensures this runs only once
 ```
 
 ## `componentDidUpdate`
@@ -47,9 +65,11 @@ shouldComponentUpdate(nextProps, nextState) {
 }
 ```
 
+At functional component we can use `useMemo`
+
 ## `getDerivedStateFromProps`
-Called before the component updates when new props are received. This method should return an object to update the state,
-or `null` to indicate that the new props do not require any state updates.
+Called before the component updates when new props are received. This method should return an object to update the 
+state, or `null` to indicate that the new props do not require any state updates.
 
 ```jsx
 static getDerivedStateFromProps(props, state) {
@@ -58,6 +78,17 @@ static getDerivedStateFromProps(props, state) {
   }
   return null;
 }
+```
+
+At functional component
+```jsx
+  const [derivedUserID, setDerivedUserID] = useState(userID); // userID is a prop
+ // Mimic getDerivedStateFromProps using useEffect
+  useEffect(() => {
+    if (userID !== derivedUserID) {
+      setDerivedUserID(userID); // Update state when props change
+    }
+  }, [userID]); // Dependency array ensures this runs only when `userID` changes
 ```
 
 ## `getSnapshotBeforeUpdate`
@@ -88,6 +119,8 @@ componentDidCatch(error, info) {
 }
 ```
 
+**No hook for this at functional component**
+
 * `error` - The error object which is thrown.
 * `info` - An object with a `componentStack` key containing information about which component threw the error.
 
@@ -99,6 +132,8 @@ static getDerivedStateFromError(error) {
   return { error };
 }
 ```
+
+**No hook available for functional component**
 
 ## `componentWillReceiveProps`
 Called when the component receives new props. This method is deprecated and should not be used in new code.

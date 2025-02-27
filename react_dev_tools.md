@@ -1,9 +1,9 @@
 # React Dev Tools
 React developer tools let us inspect the component hierarchy, including component props and state. It exists both as a
-browser extension(for chrome and firefox), and as standalone app(works with other enviroments including Safari, IE, and 
+browser extension(for chrome and firefox), and as standalone app(works with other environments including Safari, IE, and 
 React Native).
 
-The official extensions available for different browsers or enviroments.
+The official extensions available for different browsers or environments.
 * Chrome extension
 * Firefox extension
 * Standalone app(Safari, React Native, etc)

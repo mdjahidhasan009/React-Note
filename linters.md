@@ -1,7 +1,7 @@
 # Linters
-Linters are tools that analyze your code to find potential errors. They can also enforce a coding style. Linters are 
+Linters are tools that analyze your code to find potential errors. They can also enforce a coding style. Linters are
 available for many programming languages. Here are some popular linters:
-* [ESLint](https://eslint.org/): A linter for JavaScript and TypeScript.
+* [ESLint](https://eslint.org/): A linter for JavaScript and TypeScript. [npm link](https://www.npmjs.com/package/eslint)
 * [Prettier](https://prettier.io/): An opinionated code formatter.
 * [stylelint](https://stylelint.io/): A linter for CSS and SCSS.
 * [TSLint](https://palantir.github.io/tslint/): A linter for TypeScript.
@@ -9,6 +9,7 @@ available for many programming languages. Here are some popular linters:
 * [eslint-plugin-jsx-a11y](https://www.npmjs.com/package/eslint-plugin-jsx-a11y): Accessibility rules for JSX.
 * [eslint-plugin-react-hooks](https://www.npmjs.com/package/eslint-plugin-react-hooks): Additional ESLint rules for
   React hooks.
+* [eslint-plugin-react-refresh](https://www.npmjs.com/package/eslint-plugin-react-refresh): ESLint plugin for React
 
 
 ### References

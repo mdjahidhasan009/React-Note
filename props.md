@@ -153,8 +153,7 @@ export default function App() {
   );
 }
 ```
-While this approach works pretty well for simple cases, it is not that
-good for something more complicated.
+While this approach works pretty well for simple cases, it is not that good for something more complicated.
 
 
 Example in class component:
@@ -662,7 +661,7 @@ const ResizeDetector = ({ onWidthChange }) => {
 }
 ```
 
-If we want to track the window size in different components without duplicating the logic, we needs to pass a state to 
+If we want to track the window size in different components without duplicating the logic, we need to pass a state to 
 the `ResizeDetector` component but doing that we needs two state for tacking one value.
 
 ```jsx
@@ -850,6 +849,22 @@ ReactComponent.propTypes = {
 };
 ```
 
+## Prototype validation with `oneOfTypes`
+If we want to validate a prop that can be one of a few types, we can use `React.PropTypes.oneOfType()`.
+
+```jsx
+ReactComponent.propTypes = {
+  username: React.PropTypes.oneOfType([
+    React.PropTypes.string,
+    React.PropTypes.number,
+  ]).isRequired,
+};
+```
+
+## Flow
+Flow is a static type checker for JavaScript developed by Facebook. It is designed to find type errors in JavaScript
+programs. Flow is used to add static type checking to JavaScript code. It is similar to TypeScript but is designed to be
+used with JavaScript.
 
 
 

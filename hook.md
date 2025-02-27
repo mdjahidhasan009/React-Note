@@ -25,7 +25,13 @@ Some use case of context api is
   information with in components.
 
 ### `useReducer`
+`useReducer` is a hook that is used for state management in React. It is an alternative to `useState`. It is usually
+preferable to `useState` when you have complex state logic that involves multiple sub-values or when the next state
+depends on the previous one.
 ### `useMemo`
+`useMemo` is a hook that is used for memoization in React. It is used to optimize performance by memoizing the result
+of a function so that it is not recomputed on every render. It is similar to `useEffect` but it is used to memoize
+values instead of side effects.
 ### `useRef`
 
 Some use cases of `useRef` are:
@@ -38,7 +44,13 @@ Some use cases of `useRef` are:
 ref value.**
 
 ### `useCallback`
+`useCallback` is a hook that is used to memoize functions in React. It is used to optimize performance by memoizing
+functions so that they are not recreated on every render. It is similar to `useMemo` but it is used to memoize functions
+instead of values.
 ### `useImperativeHandle`
+`useImperativeHandle` is a hook that is used to customize the instance value that is exposed to parent components when
+using `React.forwardRef`. It allows you to specify which values should be exposed to the parent component when using
+`ref`.
 ### `useLayoutEffect`
 ### `useDebugValue`
 

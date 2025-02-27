@@ -1,4 +1,4 @@
-# Will add those blog
+# Will add those 
 * [TypeScript + React: Typing Generic forwardRefs](https://fettblog.eu/typescript-react-generic-forward-refs/)
   at [forwardRef > 5. Complecated typescript types](ref/forwardRef.md)
 * [React ref Callback Use Cases](https://julesblom.com/writing/ref-callback-use-cases#user-content-fn-refescapehatch)
@@ -23,7 +23,13 @@
 
 * [3 ways to autofocus an input in React that ALMOST always work!](https://blog.maisie.ink/react-ref-autofocus/)
 * [So you think you know everything about React refs](https://thoughtspile.github.io/2021/05/17/everything-about-react-refs/)
-*
+* [react-fiber-architecture - github](https://github.com/acdlite/react-fiber-architecture)
+
+
+* [React Interview Questions Senior Level (React Fiber, Reconciliation, Virtual DOM)](https://www.youtube.com/watch?v=XU6O4ASQoWs)
+* [What Is React Fiber? React.js Deep Dive #2](https://www.youtube.com/watch?v=0ympFIwQFJw)
+* [The Magic of React's Reconciliation: Behind the Scenes with a Microsoft Frontend Developer](https://www.youtube.com/watch?v=thsUZEzL8ts)
+
 
 # Blog/Article/Youtube
 * [overreacted by Dan Abramov](https://overreacted.io/)
@@ -35,8 +41,14 @@
 * [Profy dev](https://www.youtube.com/@profydev)
 
 
+# Pattern
+* For form
+  * Render props
+  * Component Compound
+  * Function Children
+
 # Interview Questions
-* [reactjs-interview-questions - github](https://github.com/sudheerj/reactjs-interview-questions) from 140 to last added
+* [reactjs-interview-questions - github](https://github.com/sudheerj/reactjs-interview-questions) from 163 to last added
   from 1 to 139 are already added in this repo
   * But added those after 140 
     * 150, 151

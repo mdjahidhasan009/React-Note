@@ -108,6 +108,27 @@ Although 99% of shared logic can be done with hooks and 100% of shared state or 
 some case like **enhancing callbacks, react lifecycle events, intercepting DOM and keyboard events** HOCs are still 
 useful.
 
+
+## What is a Higher Order Component?
+Higher-Order Components (HOC) in React are functions that take a component as an argument and return a new enhanced component. They enable code reuse, logic abstraction, and component composition by wrapping existing components with additional functionality. HOCs follow the principle of higher-order functions in JavaScript and are commonly used to extend component behavior without modifying the original component.
+## Why HOC should be used?
+HOCs should be used to improve code reusability, separation of concerns, and maintainability in React applications. Instead of duplicating logic across multiple components, HOCs allow shared functionalities—such as authentication handling, logging, or theming—to be applied consistently. They help keep components clean and focused on their specific responsibilities while external logic is handled in a separate, reusable function.
+## When to use HOCs?
+HOCs are ideal when multiple components need to share the same logic without redundancy. They should be used in scenarios such as authentication validation, API data fetching, performance optimizations (e.g., memoization), or conditional rendering based on user roles or permissions. However, they should be applied judiciously to avoid excessive nesting, which can make debugging and component tracing difficult.
+## How to use HOCs?
+To create an HOC, define a function that accepts a component as an argument and returns a new component with additional props or behaviors. The HOC can wrap the input component with extra logic, such as data fetching or state management, and return the modified component. When using an HOC, simply pass the base component to it and use the returned enhanced component in your application. For example:
+```jsx
+const withLogger = (WrappedComponent) => {
+  return (props) => {
+    console.log("Component rendered with props:", props);
+    return <WrappedComponent {...props} />;
+  };
+};
+
+const EnhancedComponent = withLogger(MyComponent);
+```
+
+
 ## Enhancing Callbacks
 ### Logging on Click
 If we use hooks here then we needs to pass the log function as a prop to the component. 
@@ -500,6 +521,42 @@ export default function App() {
   );
 }
 ```
+
+
+
+## Render Hijacking in React
+
+The concept of render hijacking is the ability to control what a component will output from another component. It means 
+that you decorate your component by wrapping it into a Higher-Order component (HOC). By wrapping, you can inject
+additional props or make other changes, which can cause changing logic of rendering. It does not actually enable 
+hijacking, but by using HOC you make your component behave differently.
+
+### Example:
+
+```jsx
+import React from 'react';
+
+const withRenderHijack = (WrappedComponent) => {
+  return class extends React.Component {
+    render() {
+      // Modify props or behavior here
+      const newProps = { extraProp: 'This is an injected prop' };
+      return <WrappedComponent {...this.props} {...newProps} />;
+    }
+  };
+};
+
+const SimpleComponent = (props) => {
+  return <div>{props.extraProp}</div>;
+};
+
+const EnhancedComponent = withRenderHijack(SimpleComponent);
+
+export default EnhancedComponent;
+```
+
+In this example, `withRenderHijack` is a Higher-Order Component that wraps `SimpleComponent` and injects an additional
+prop, modifying its behavior dynamically.
 
 ### Source:
 * [Advanced React](https://www.advanced-react.com/)

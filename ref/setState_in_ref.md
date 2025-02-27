@@ -3,7 +3,8 @@ For DOM manipulation, we can use `ref` attribute. But can we assign `setState` t
 Popper.js is a library that helps you position elements like tooltips and popovers in the DOM. It's a popular library 
 that is used in many projects.
 
-This library putting state setter function in `ref` attribute `<div ref={setPopperElement} style={styles.popper} {...attributes.popper}>`.
+This library putting state setter function in `ref` attribute 
+`<div ref={setPopperElement} style={styles.popper} {...attributes.popper}>`.
 
 ```jsx
 import React, { useState } from 'react';
@@ -130,7 +131,10 @@ export const EffectStateExample = () => {
 };
 ```
 This why `ref={setReferenceElement}` will not cause re-rendering. Because `setReferenceElement` is not changing the 
-state of the component. It's just setting the dom element to the state. Unless we remove it conditionally, it will not cause re-rendering.
+state of the component. It's just setting the dom element to the state. Unless we remove it conditionally, it will not 
+cause re-rendering.
+
+
 
 ## Rewritten Code with useRef
 
@@ -178,7 +182,9 @@ export default PopperExample;
 
 ## Explanation
 
-We remove all state with ref `referenceElement`, `popperElement`. Now on hover no longer positions the tool tip correctly. To understand what's happening, let's analyze how this code runs step by step starting from the initial render:
+We remove all state with ref `referenceElement`, `popperElement`. Now on hover no longer positions the tool tip
+correctly. To understand what's happening, let's analyze how this code runs step by step starting from the initial
+render:
 
 1. **Initial Render**:
     - `useState` for `isVisible` flag is called with the initial value `false`.
@@ -200,7 +206,8 @@ We remove all state with ref `referenceElement`, `popperElement`. Now on hover n
 
 3. **On Mouse Enter**:
     - Hovering over the reference element triggers the `onMouseEnter` event which sets `isVisible` to `true`.
-    - Setting state triggers a new render, now `isVisible` is `true` and refs are read from `useRef` and passed to the `usePopper` hook.
+    - Setting state triggers a new render, now `isVisible` is `true` and refs are read from `useRef` and passed to the 
+      `usePopper` hook.
     - But `popperElement` will be still undefined because it is not yet rendered(return statement re-executed yet).
 
     ```jsx
@@ -213,19 +220,26 @@ We remove all state with ref `referenceElement`, `popperElement`. Now on hover n
 4. **Rendering Tooltip**:
     - We then go again to the return statement so jsx get parsed this `isVisible` true so `popperElement` get DOM node.
     - The tooltip is rendered and styles from `usePopper` are applied.
-    - The styles are incorrect because they are based only on the reference element, and popper element is still `undefined`.
-    - After this render, the tooltip's DOM element is attached and the `usePopper` get updated DOM node. We need another rerender to update `usePopper` hook.
+    - The styles are incorrect because they are based only on the reference element, and popper element is still 
+      `undefined`.
+    - After this render, the tooltip's DOM element is attached and the `usePopper` get updated DOM node. We need another
+      rerender to update `usePopper` hook.
 
 5. **Final Render**:
     - At this rerender `usePopper` has both `referenceElement`, `popperElement`.
     - The execution stops here but needs another render to correctly calculate styles based on both elements.
     - Updating the `poperElement` does not trigger a new render, unlike `setState` calls.
-    - To currectly show we need latest `referenceElement` but on change `poperElement` does not trigger any rerender and we are left with old `referenceElement` at `usePopper` hook and so wrong css.
+    - To currently show we need latest `referenceElement` but on change `poperElement` does not trigger any rerender and
+      we are left with old `referenceElement` at `usePopper` hook and so wrong css.
 
-Updating ref does not trigger new render as opposed to `setState` calls so we end up in this synchronized state where tooltip was rendered but `popper.js` calculated styles based only on reference element(which is old). The lesson is when you have a DOM element that you need to use
-in the rendering code like to pass it to external Library such as `popper.js` or read some values from it in render phasce like DOM element measurements that we've seen before in react docs.
+Updating ref does not trigger new render as opposed to `setState` calls so we end up in this synchronized state where 
+tooltip was rendered but `popper.js` calculated styles based only on reference element(which is old). The lesson is when 
+you have a DOM element that you need to use in the rendering code like to pass it to external Library such as 
+`popper.js` or read some values from it in render phasce like DOM element measurements that we've seen before in react 
+docs.
+
 <details>
-    <summary>DOM Element managed by React for createPortal() function</summary>
+<summary>DOM Element managed by React for createPortal() function</summary>
 
 This is an example of how you can dynamically access the DOM Node of an element managed by React, then pass it correctly to the `createPortal` function.
 ```javascript
@@ -247,8 +261,11 @@ export const ModalExample = () => {
 ```
 </details>
 
-Or maybe access DOM element managed by react and pass it as an argument for create portal function in all those cases we should not save your DOM element in `ref` you should save it in `state` because state setter function triggers render and your DOM will basically synchronized with react render cycle it's kind of a huge passing set state to ref attribute
-feels like going against react it was unintuitive for the react team itself but it's actually perfectly fine and itcan be very useful so we can see at this example.
+Or maybe access DOM element managed by react and pass it as an argument for create portal function in all those cases we
+should not save your DOM element in `ref` you should save it in `state` because state setter function triggers render 
+and your DOM will basically synchronized with react render cycle it's kind of a huge passing set state to ref attribute
+feels like going against react it was unintuitive for the react team itself but it's actually perfectly fine and itcan 
+be very useful so we can see at this example.
 
 
 
