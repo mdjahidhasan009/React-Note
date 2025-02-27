@@ -1,0 +1,10 @@
+@import 'tailwindcss';
+
+@theme {
+  --default-font-family: 'Poppins', sans-serif;
+  --default-font-size: 16px;
+  --default-font-weight: 400;
+  --default-line-height: 1.5;
+  --default-letter-spacing: 0.01em;
+  --default-text-color: #333;
+}
