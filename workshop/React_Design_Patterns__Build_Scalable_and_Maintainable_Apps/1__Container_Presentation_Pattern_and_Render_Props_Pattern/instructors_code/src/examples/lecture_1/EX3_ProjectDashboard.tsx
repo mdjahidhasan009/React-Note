@@ -105,6 +105,12 @@ export default ProjectDashboard;
 ❌ Difficult to Test & Reuse → You can't reuse the team member list or comments elsewhere without copying logic.
 */
 
+
+
+
+
+
+
 /**
  * ✅ Good Example
  */
@@ -128,6 +134,9 @@ type Project = {
 	comments: Comment[];
 };
 
+
+// project and team are related so they needs to be in the same component
+// We can separate comment state and api call to a separate component to make the code more clean and maintainable
 export const ProjectDashboardGood = ({ projectId }: { projectId: string }) => {
 	// This is a container component
 	// So that, we can have states and logic for this component

@@ -1,3 +1,4 @@
+// main fine example in src/examples/lecture_2/EX8_FeatureFlag.tsx
 import { createContext, ReactNode, useContext } from 'react';
 
 type FeatureFlagContext = {

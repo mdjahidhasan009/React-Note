@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 /**
  * Bad Example:
@@ -51,10 +51,23 @@ export const DashboardBad = () => {
 	);
 };
 
+
+
+
+
+
+
+
+
+
+
+
 /**
  * Good Example
  */
 
+// This DashboardGood is container component, it is responsible for managing the state and passing the data to the
+// presentational components, business logic, and API calls.
 export const DashboardGood = () => {
 	const [notifications, _setNotifications] = useState([
 		'New message',
@@ -72,6 +85,11 @@ export const DashboardGood = () => {
 	);
 };
 
+
+// We make UserProfile a container component, so it will fetch the data from the API, and will manage the state of user
+// as this data does not require to be shared with other components, so we are using colocation pattern to manage the
+// state of user in this component. By doing so other components will not be able to access the user state also will not
+// trigger unnecessary re-renders at DashboardGood component.
 type User = {
 	name: string;
 	email: string;

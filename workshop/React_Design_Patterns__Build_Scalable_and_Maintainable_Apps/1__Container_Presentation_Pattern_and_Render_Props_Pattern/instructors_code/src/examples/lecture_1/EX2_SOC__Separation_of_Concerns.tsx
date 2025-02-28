@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 
+// Will solve using hook in future
 export const CheckoutBad = () => {
 	const [_user, setUser] = useState(null);
 	const [cart, setCart] = useState([]);
