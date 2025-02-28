@@ -861,6 +861,29 @@ ReactComponent.propTypes = {
 };
 ```
 
+## Default props
+The defaultProps can be defined as a property on the component to set the default values for the props. These default 
+props are used when props not supplied(i.e., undefined props), but not for null or 0 as props. That means, If you 
+provide null value then it remains null value. It's the same behavior with 0 as well.
+
+For example, let us create color default prop for the button component,
+```jsx
+function MyButton {
+  // ...
+}
+
+MyButton.defaultProps = {
+  color: "red",
+};
+```
+If `props.color` is not provided then it will set the default value to 'red'. i.e, Whenever you try to access the color
+prop it uses the default value
+```jsx
+function MyButton() {
+  return <MyButton />; // props.color will contain red value
+}
+```
+
 ## Flow
 Flow is a static type checker for JavaScript developed by Facebook. It is designed to find type errors in JavaScript
 programs. Flow is used to add static type checking to JavaScript code. It is similar to TypeScript but is designed to be
