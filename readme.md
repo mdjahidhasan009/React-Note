@@ -88,11 +88,15 @@ ReactDOM.render(
 
 ## Composition over Inheritance in React: A Detailed Explanation
 
-In React, the recommended approach for code reuse between components is **composition over inheritance**.  While inheritance is a common pattern in object-oriented programming, it often leads to problems in React, particularly as applications grow in complexity.  Composition, on the other hand, provides a more flexible and maintainable way to share functionality.
+In React, the recommended approach for code reuse between components is **composition over inheritance**.  While
+inheritance is a common pattern in object-oriented programming, it often leads to problems in React, particularly as 
+applications grow in complexity.  Composition, on the other hand, provides a more flexible and maintainable way to share 
+functionality.
 
 ### Why Inheritance is Not Preferred in React (with Example)
 
-Let's illustrate the problems with inheritance in React using a concrete example. Imagine we're building a UI library with different button components.
+Let's illustrate the problems with inheritance in React using a concrete example. Imagine we're building a UI library
+with different button components.
 
 ```javascript
 // Button.js (Base Class - Using Inheritance)
@@ -183,11 +187,14 @@ to the `Button` component are less likely to break other parts of the applicatio
 
 ### Props and Composition: The React Way
 
-React provides two powerful mechanisms for code reuse: props and composition.  Both offer the flexibility needed to customize a component's appearance and behavior in a clear and safe manner.
+React provides two powerful mechanisms for code reuse: props and composition.  Both offer the flexibility needed to 
+customize a component's appearance and behavior in a clear and safe manner.
 
-**Props:** Props are used to pass data from a parent component to a child component.  They allow you to configure the child component's appearance and behavior.
+**Props:** Props are used to pass data from a parent component to a child component.  They allow you to configure the
+child component's appearance and behavior.
 
-**Composition:** Composition involves wrapping one component within another.  The inner component can then receive data and callbacks via props, and the outer component can control the overall structure and layout.
+**Composition:** Composition involves wrapping one component within another.  The inner component can then receive data 
+and callbacks via props, and the outer component can control the overall structure and layout.
 
 **Example:**
 

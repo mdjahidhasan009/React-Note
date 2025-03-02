@@ -223,6 +223,47 @@ return <div onPointerOut={handlePointerOut}>Leave me</div>;
 
 
 
+# Capture Phase Events
+
+The `onClickCapture` React event is useful to catch all the events of child elements irrespective of event propagation
+logic or even if the events propagation stopped. This is particularly useful for tasks like logging every click event 
+for analytics purposes.
+
+**Key Characteristics:**
+
+* **Capture Phase:** Events are handled during the capture phase of event propagation.
+* **Guaranteed Execution:** `onClickCapture` handlers are executed even if child elements stop event propagation.
+* **Top-Down Execution:** Capture phase events propagate from the root of the DOM tree down to the target element.
+
+**Example:**
+
+```jsx
+<div onClickCapture={() => alert("parent")}>
+  <div onClickCapture={() => alert("child")}>
+    <button onClick={(e) => e.stopPropagation()} />
+    <button onClick={(e) => e.stopPropagation()} />
+  </div>
+</div>
+```
+
+## Event Propagation Order:
+* **Capture Phase (Top-Down):**
+  * `onClickCapture` event handlers are executed, starting from the outermost element and proceeding down the DOM tree.
+  * In the example, the "parent" alert is triggered first, followed by the "child" alert.
+* **Target Phase:**
+  * The `onClick` event handler on the target element (the button) is executed.
+  * In the example, `e.stopPropagation()` is called, preventing the event from bubbling.
+* **Bubbling Phase (Bottom-Up):**
+  * Normally, events would bubble up the DOM tree, triggering `onClick` handlers.
+  * However, in this example, `e.stopPropagation()` prevents the bubbling phase.
+  * Therefore, no `onClick` events on the parent divs will trigger.
+
+## Use Cases:
+
+* **Analytics:** Logging all click events for tracking user behavior.
+* **Centralized Event Handling:** Implementing global event listeners that capture events before they reach their 
+  intended targets.
+* **Debugging:** Inspecting the order of event propagation.
 
 
 ### References

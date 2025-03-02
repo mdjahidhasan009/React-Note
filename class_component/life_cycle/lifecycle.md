@@ -169,6 +169,45 @@ componentWillMount() {
 }
 ```
 
+### Using `setState()` in `componentWillMount()`
+
+While it's technically safe to use `setState()` within the `componentWillMount()` lifecycle method, it's generally **not recommended**, especially for asynchronous operations.
+
+**Why `setState()` Works (But Is Discouraged):**
+
+* `componentWillMount()` is invoked immediately before mounting occurs, right before the `render()` method is called.
+* Because it's called before `render()`, setting state in `componentWillMount()` will not trigger an extra re-render. React will apply the state update and then perform the initial render.
+
+**Why It's Discouraged (Especially for Async):**
+
+* **Deprecation:** `componentWillMount()` has been deprecated in newer versions of React (React 17 and later) and replaced with `getDerivedStateFromProps()` and `componentDidMount()`.
+* **Async Issues:** Avoid asynchronous initialization within `componentWillMount()`. If you're fetching data or performing other asynchronous tasks, do it in `componentDidMount()`.
+* **Server-Side Rendering:** In server-side rendering (SSR), `componentWillMount()` may be called multiple times, leading to unexpected behavior with asynchronous operations.
+* **Side Effects:** Avoid introducing any side effects or subscriptions in this method.
+
+**Recommended Approach: `componentDidMount()` for Async**
+
+For asynchronous operations, such as fetching data from an API, use the `componentDidMount()` lifecycle method.
+
+**Example: Fetching Data in `componentDidMount()`**
+
+```jsx
+componentDidMount() {
+  axios.get(`api/todos`)
+    .then((result) => {
+      this.setState({
+        messages: [...result.data]
+      })
+    });
+}
+```
+
+#### Key Takeaways:
+
+* While `setState()` in `componentWillMount()` won't cause immediate errors, it's not a best practice.
+* Avoid async calls and side effects in `componentWillMount()`.
+* Use `componentDidMount()` for asynchronous operations and data fetching.
+* Be aware of the deprecation of `componentWillMount()` in newer React versions. 
 
 
 
