@@ -309,6 +309,64 @@ Let's see the difference between React and Angular in a table format.
 
 
 
+# Is it possible to use React without rendering HTML?
+
+Yes, it is possible. Below are the possible options:
+
+```javascript
+render() {
+  return false
+}
+```
+
+```javascript
+render() {
+  return true
+}
+```
+
+```javascript
+render() {
+  return null
+}
+```
+
+**React version >= 16.0.0:**
+
+```javascript
+render() {
+  return []
+}
+```
+
+```javascript
+render() {
+  return ""
+}
+```
+
+**React version >= 16.2.0:**
+
+```javascript
+render() {
+  return <React.Fragment></React.Fragment>
+}
+```
+
+```javascript
+render() {
+  return <></>
+}
+```
+
+**React version >= 18.0.0:**
+
+```javascript
+render() {
+  return undefined
+}
+
+
 
 
 ### References

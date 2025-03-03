@@ -42,6 +42,30 @@ componentDidUpdate(prevProps, prevState) {
 }
 ```
 
+### How to Listen to State Changes
+
+The `componentDidUpdate` lifecycle method will be called when state changes. You can compare provided state and props 
+values with the current state and props to determine if something meaningful changed.
+
+```javascript
+componentDidUpdate(prevProps, prevState) {
+  // Compare prevState and this.state to check for specific changes
+  if (prevState.someValue !== this.state.someValue) {
+    // Perform actions based on the state change
+    console.log('someValue has changed from', prevState.someValue, 'to', this.state.someValue);
+  }
+
+  // Example: Check if props changed as well
+   if (prevProps.someProp !== this.props.someProp) {
+    console.log('someProp has changed');
+   }
+}
+```
+
+**Note:** Previous ReactJS releases also used `componentWillUpdate(nextProps, nextState)` for state changes. It has been 
+deprecated in the latest releases.
+
+
 ## `componentWillUnmount`
 Called before the component is removed from the DOM. This is a good place to clean up any resources used by the component.
 
@@ -68,8 +92,9 @@ shouldComponentUpdate(nextProps, nextState) {
 At functional component we can use `useMemo`
 
 ## `getDerivedStateFromProps`
-Called before the component updates when new props are received. This method should return an object to update the 
-state, or `null` to indicate that the new props do not require any state updates.
+This lifecycle method called after a component is created and before it is rendered also called when it receives new
+props(re-render). It should return an object to update the state, or `null` to update nothing. It enables a component to
+update its internal state as the result of changes in props.
 
 ```jsx
 static getDerivedStateFromProps(props, state) {
@@ -90,6 +115,8 @@ At functional component
     }
   }, [userID]); // Dependency array ensures this runs only when `userID` changes
 ```
+
+This lifecycle method along with `componentDidUpdate()` covers all the use cases of `componentWillUpdate()`.
 
 ## `getSnapshotBeforeUpdate`
 Called before the component updates. This method should return a value to be passed to `componentDidUpdate`, or `null` if
@@ -271,6 +298,21 @@ Source: [reactjs-interview-questions - github](https://github.com/sudheerj/react
 - **componentWillUnmount**: It will be used to cancel any outgoing network requests, or remove all event listeners associated with the component.
 
 
+Order of methods in component class
+* `static` methods
+* `constructor()`
+* `getChildContext()`
+* `componentWillMount()`
+* `componentDidMount()`
+* `componentWillReceiveProps()`
+* `shouldComponentUpdate()`
+* `componentWillUpdate()`
+* `componentDidUpdate()`
+* `componentWillUnmount()`
+* click handlers or event handlers like `onClickSubmit()` or `onChangeDescription()`
+* getter methods for render like `getSelectReason()` or `getFooterContent()`
+* optional render methods like `renderNavigation()` or `renderProfilePicture()`
+* `render()`
 
 
 ### References

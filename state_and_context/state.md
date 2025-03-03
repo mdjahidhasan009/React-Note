@@ -522,6 +522,208 @@ export default Counter;
 
 
 
+# Why Pass a Function to `setState()`?
+
+The primary reason for passing a function to `setState()` instead of a plain object is to avoid issues caused by the 
+asynchronous and batched nature of `setState()`.
+
+`setState()` is **asynchronous**.  React batches state updates for performance optimization. This means that when you 
+call `setState()`, the state doesn't immediately update. You shouldn't rely on `this.state` immediately after calling 
+`setState()` to reflect the new value, because it might not be updated yet.
+
+### The Problem: Relying on `this.state` Immediately
+
+Consider this scenario where the initial `count` is 0:
+
+```javascript
+// Assuming this.state.count === 0
+this.setState({ count: this.state.count + 1 });
+this.setState({ count: this.state.count + 1 });
+this.setState({ count: this.state.count + 1 });
+// this.state.count === 1, not 3
+```
+
+Because `setState()` is asynchronous and potentially batched, React might execute all three calls to `setState()` using the *same* initial `this.state.count` value (which is 0).  Each `setState()` call essentially does this: `count: 0 + 1`, resulting in `count` being set to 1 after all three calls.
+
+### The Solution: Using a Function with `setState()`
+
+Passing a function to `setState()` solves this problem.  The function receives the *previous* state as its first argument. This ensures that each update is based on the *correct*, most recent state.
+
+```javascript
+this.setState((prevState, props) => ({
+  count: prevState.count + props.increment,
+}));
+// this.state.count === 3 (as expected) if props.increment is 1
+```
+
+In this example:
+
+1.  React queues the function to be executed.
+2.  When React processes the queue, it calls the function, providing the *previous* state.
+3.  The function calculates the new state based on the *previous* state and the provided props.
+4.  React merges the returned object from the function with the current state, triggering a re-render if necessary.
+
+### Why Function is Preferred Over Object for `setState()`
+
+* **Asynchronous Updates:** React may batch multiple `setState()` calls into a single update for performance.  Because `this.props` and `this.state` may be updated asynchronously, you should not directly rely on their values to calculate the next state in a simple object literal passed to `setState()`.
+
+* **Correct State Calculation:** Using a function ensures that the state update is based on the most recent state.
+
+**Example of Incorrect Usage (Object Literal):**
+
+```javascript
+// Wrong
+this.setState({
+  counter: this.state.counter + this.props.increment,
+});
+```
+
+**Correct Usage (Function):**
+
+```javascript
+// Correct
+this.setState((prevState, props) => ({
+  counter: prevState.counter + props.increment,
+}));
+```
+
+**In Summary:** Always use a function to update state in `setState()` when the new state depends on the previous state or props. This prevents subtle and difficult-to-debug issues caused by the asynchronous nature of React's state updates and guarantees correct updates. This is especially true in scenarios involving increments, decrements, or other calculations that rely on the current state.
+
+
+
+
+
+# Constructor vs. `getInitialState()`
+
+You should initialize state in the `constructor` when using ES6 classes, and the `getInitialState()` method when using
+`React.createClass()`.
+
+**Using ES6 classes:**
+
+```javascript
+class MyComponent extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      /* initial state */
+    };
+  }
+}
+```
+
+**Using `React.createClass()`:**
+
+```javascript
+const MyComponent = React.createClass({
+  getInitialState() {
+    return {
+      /* initial state */
+    };
+  },
+});
+```
+
+**Note:** `React.createClass()` is deprecated and removed in React v16. Use plain JavaScript classes instead.
+
+
+
+
+## Can you force a component to re-render without calling `setState`?
+
+By default, when your component's state or props change, your component will re-render. If your `render()` method
+depends on some other data, you can tell React that the component needs re-rendering by calling `forceUpdate()`.
+
+```javascript
+component.forceUpdate(callback);
+```
+
+It is recommended to avoid all uses of `forceUpdate()` and only read from `this.props` and `this.state` in `render()`.
+
+
+
+
+# `super()` vs. `super(props)` in React ES6 Classes
+
+When you want to access `this.props` in `constructor()`, then you should pass `props` to the `super()` method.
+
+**Using `super(props)`:**
+
+```javascript
+class MyComponent extends React.Component {
+  constructor(props) {
+    super(props);
+    console.log(this.props); // { name: 'John', ... }
+  }
+}
+```
+
+**Using `super()`:**
+
+```javascript
+class MyComponent extends React.Component {
+  constructor(props) {
+    super();
+    console.log(this.props); // undefined
+  }
+}
+```
+
+Outside `constructor()`, both will display the same value for `this.props`.
+
+
+
+
+
+# `setState()` vs. `replaceState()`
+
+When you use `setState()`, the current and previous states are merged. `replaceState()` throws out the current state and
+replaces it with only what you provide.
+
+Usually, `setState()` is used unless you really need to remove all previous keys for some reason. You can also set state to `false`/`null` in `setState()` instead of using `replaceState()`.
+
+**Example:**
+
+Let's say your initial state is:
+
+```javascript
+this.state = {
+  name: 'Alice',
+  age: 30,
+  city: 'New York'
+};
+```
+
+**Using `setState()`:**
+
+```javascript
+this.setState({
+  age: 31
+});
+
+// Resulting state:
+// {
+//   name: 'Alice',
+//   age: 31,
+//   city: 'New York'
+// }
+```
+
+**Using `replaceState()` (Hypothetical, since it's deprecated - but to illustrate the difference):**
+
+```javascript
+// Assuming replaceState still exists and is used like this
+this.replaceState({  //Note that replaceState is deprecated
+  age: 31
+});
+
+// Resulting state:
+// {
+//   age: 31
+// }
+```
+
+The `name` and `city` properties are removed when using `replaceState()`. Because `replaceState()` is deprecated, this 
+functionality is not available in modern React.
 
 
 
