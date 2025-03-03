@@ -47,6 +47,9 @@
     * **No isolation between components**. As it operates on windows object, other components this form may also get 
       affected.
   </details>
+* Managing focus, text selection, or media playback.
+* Triggering imperative animations.
+* Integrating with third-party DOM libraries.
 
 Once that ref is created, we can assign anything to it within `useEffect` or event handlers. It's just an object, 
   nothing special:
@@ -166,6 +169,15 @@ const usePrevious = (value) => {
     export default RefsMistake;
    ```
 </details>
+
+
+
+
+
+
+
+
+
 
 
 ### DOM Refs
@@ -764,6 +776,138 @@ const Form = () => {
 * What is render and commit phase?
 * Why refs are called an escape hatch?
 * When to use state instead of refs?
+
+
+
+
+
+
+# React Refs: Creation, Forwarding, and Best Practices
+
+Refs provide a way to access DOM nodes or React elements created in the render method. Here's a comprehensive guide to creating, forwarding, and using refs effectively.
+
+## Creating Refs
+
+**1. `React.createRef()` (Recommended):**
+
+* This is the modern and preferred approach.
+* Creates a ref object that can be attached to React elements.
+* Accessible through the `current` property of the ref object.
+
+```jsx
+class MyComponent extends React.Component {
+  constructor(props) {
+    super(props);
+    this.myRef = React.createRef();
+  }
+  render() {
+    return <div ref={this.myRef} />;
+  }
+}
+```
+## 2. Callback Refs:
+
+* Works across all React versions.
+* Provides more control over when the ref is set and unset.
+* The callback receives the DOM element or React component instance as its argument.
+
+```jsx
+class SearchBar extends React.Component {
+  constructor(props) {
+    super(props);
+    this.txtSearch = null;
+    this.state = { term: "" };
+    this.setInputSearchRef = (e) => {
+      this.txtSearch = e;
+    };
+  }
+  onInputChange(event) {
+    this.setState({ term: this.txtSearch.value });
+  }
+  render() {
+    return (
+      <input
+        value={this.state.term}
+        onChange={this.onInputChange.bind(this)}
+        ref={this.setInputSearchRef}
+      />
+    );
+  }
+}
+```
+You can also use callback refs in function components with closures.
+
+## Callback Refs vs. `findDOMNode()`
+
+* Callback refs are preferred over `findDOMNode()`.
+* `findDOMNode()` can prevent future optimizations in React.
+* **Legacy `findDOMNode()`:**
+
+### Legacy `findDOMNode()`:
+```jsx
+import React, { Component, findDOMNode } from 'react';
+
+class MyComponent extends Component {
+  componentDidMount() {
+    findDOMNode(this).scrollIntoView();
+  }
+
+  render() {
+    return <div />;
+  }
+}
+```
+### Recommended Callback Ref Approach:
+```jsx
+import React, { Component, createRef } from 'react';
+
+class MyComponent extends Component {
+  constructor(props) {
+    super(props);
+    this.node = createRef();
+  }
+  componentDidMount() {
+    this.node.current.scrollIntoView();
+  }
+
+  render() {
+    return <div ref={this.node} />;
+  }
+}
+```
+
+## Why String Refs Are Legacy
+
+* String refs (e.g., `ref={'textInput'}`) are considered legacy and were removed in React v16.
+* **Issues:**
+  * They make React's internal stateful, which can lead to errors.
+  * They are not composable.
+  * They don't work well with static analysis tools like Flow.
+  * They behave unexpectedly with the "render callback" pattern.
+
+### Example of String Ref Problem
+```jsx
+class MyComponent extends Component {
+  renderRow = (index) => {
+    // This won't work. Ref will get attached to DataTable rather than MyComponent:
+    return <input ref={"input-" + index} />;
+
+    // This would work though! Callback refs are awesome.
+    return <input ref={(input) => (this["input-" + index] = input)} />;
+  };
+
+  render() {
+    return (
+      <DataTable data={this.props.data} renderRow={this.renderRow} />
+    );
+  }
+}
+```
+
+
+
+
+
 
 # Sources
 * [Essential React: 5 Mistakes to Master React DOM Refs](https://www.youtube.com/watch?v=XL7h3sjnLaY)

@@ -332,11 +332,13 @@ Consequences of keeping components in single virtual DOM
 - Suspense working across the tree
 
 ## When to use Portals
-- Whenever want to allow users to take slice of UI and render it in separate window(we can synchronize browser memory but 
-  that is expansive)
+- Whenever want to allow users to take slice of UI and render it in separate window(we can synchronize browser memory 
+  but that is expansive)
 - Print certificates or invoices
 - DevTools react query devtools already using portal to render the query devtools in a separate window
 - Picture-in-Picture API
+- Dialog, global message notification, hover cards, tooltips, dropdowns, context menus, modals, popovers, popups, 
+  notifications, and so on
 
 **One limitation of this technics**
 - We can only portal to the windows that we expicitly open from our code using `window.open()`. This is security aspect 

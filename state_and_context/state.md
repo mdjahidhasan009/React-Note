@@ -54,6 +54,21 @@ class Example extends React.Component {
 }
 ```
 
+### Set state with dynamic key
+If you are using ES6 or the Babel transpiler to transform your JSX code then you can accomplish this with computed 
+property names.
+```jsx
+this.setState({ [key]: value });
+```
+
+Example:
+```jsx
+//eslint-disable-next-line
+handleInputChange(event) {
+  this.setState({ [event.target.id]: event.target.value })
+}
+```
+
 
 ## state vs props
 
@@ -167,6 +182,347 @@ reserved for situations where immediate DOM updates are absolutely necessary.
 * `flushSync` should be used only when you absolutely need to force a synchronous update. Overuse can degrade 
   performance.
 * For most common scenarios, relying on automatic batching will provide the best performance.
+
+
+
+
+# Updating Objects, Nested Objects, and Arrays in React State
+
+In React, state should be treated as immutable. This means you should avoid directly modifying objects and arrays within the state. Instead, create new copies and update the state with these copies.
+
+## Updating Objects Inside State
+
+Directly mutating objects in state can lead to unexpected behavior and UI inconsistencies.
+
+**Incorrect Approach (Direct Mutation):**
+
+```jsx
+import { useState } from "react";
+
+export default function Profile() {
+  const [user, setUser] = useState({
+    firstName: "John",
+    lastName: "Abraham",
+    age: 30,
+  });
+
+  function handleFirstNameChange(e) {
+    // This will not trigger a re-render so the UI won't update
+    user.firstName = e.target.value; // Direct mutation - Avoid this!
+  }
+
+  function handleLastNameChange(e) {
+    // This will not trigger a re-render so the UI won't update
+    user.lastName = e.target.value; // Direct mutation - Avoid this!
+  }
+
+  function handleAgeChange(e) {
+    // This will not trigger a re-render so the UI won't update  
+    user.age = e.target.value; // Direct mutation - Avoid this!
+  }
+
+  return (
+          <>
+            {/* ... input fields ... */}
+            <p>
+              Profile: {user.firstName} {user.lastName} ({user.age})
+            </p>
+          </>
+  );
+}
+```
+
+### Correct Approach (Creating a New Object):
+
+Use the spread syntax (`...`) to create a shallow copy of the object and update the necessary properties.
+
+```javascript
+import { useState } from "react";
+
+export default function Profile() {
+  const [user, setUser] = useState({
+    firstName: "John",
+    lastName: "Abraham",
+    age: 30,
+  });
+
+  function handleProfileChange(e) {
+    setUser({
+      ...user,
+      [e.target.name]: e.target.value,
+    });
+  }
+
+  return (
+          <>
+            <label>
+              First name:
+              <input name="firstName" value={user.firstName} onChange={handleProfileChange} />
+            </label>
+            <label>
+              Last name:
+              <input name="lastName" value={user.lastName} onChange={handleProfileChange} />
+            </label>
+            <label>
+              Age:
+              <input name="age" value={user.age} onChange={handleProfileChange} />
+            </label>
+            <p>
+              Profile: {user.firstName} {user.lastName} ({user.age})
+            </p>
+          </>
+  );
+}
+```
+
+## Updating Nested Objects Inside State
+
+The spread syntax performs a shallow copy. For nested objects, you need to create new copies of each nested level.
+
+**Example:**
+
+```javascript
+const user = {
+  name: "John",
+  age: 32,
+  address: {
+    country: "Singapore",
+    postalCode: 440004,
+  },
+};
+
+// Incorrect (Direct Nested Mutation):
+// user.address.country = "Germany"; // Avoid this!
+
+// Correct (Creating New Nested Objects):
+setUser({
+  ...user,
+  address: {
+    ...user.address,
+    country: "Germany",
+  },
+});
+```
+
+
+### Deeply Nested Objects:
+
+For deeply nested objects, consider using libraries like Immer to simplify immutable updates.
+
+## Updating Arrays Inside State
+
+Similar to objects, arrays should be treated as immutable.
+
+**Incorrect Approach (Direct Mutation):**
+
+```javascript
+const [todos, setTodos] = useState([]);
+
+function handleClick(id, name) {
+  todos.push({ id: id + 1, name: name }); // Direct mutation - Avoid this!
+  setTodos(todos); //state won't update
+}
+```
+
+### Correct Approach (Creating a New Array):
+
+Use the spread syntax or array methods like `slice`, `map`, or `filter` to create a new array.
+
+```javascript
+const [todos, setTodos] = useState([]);
+
+function handleClick(id, name) {
+  setTodos([
+    ...todos,
+    { id: id + 1, name: name },
+  ]);
+}
+```
+
+
+## Avoid Direct Array Mutations:
+
+* `arr[index] = newValue`
+* `arr.push()`
+* `arr.pop()`
+* `arr.shift()`
+* `arr.unshift()`
+* `arr.splice()`
+
+## Use Immutable Array Operations:
+
+* Spread syntax (`...`)
+* `arr.slice()`
+* `arr.map()`
+* `arr.filter()`
+* `arr.concat()`
+
+## Key Takeaways:
+
+* Always create new copies of objects and arrays when updating state.
+* Use the spread syntax for shallow copies.
+* For nested objects, create copies at each level.
+* Use immutable array operations.
+* Consider using Immer for complex state updates.
+
+
+# Using Immer for State Updates in React
+
+Immer is a library that simplifies immutable state updates by leveraging a "copy-on-write" mechanism. It uses JavaScript proxies to track modifications to immutable states, making state management more intuitive and less verbose.
+
+**Immer's Core Concepts:**
+
+* **Current State:** The actual, immutable state.
+* **Draft State:** A mutable proxy of the current state. All changes are made to this draft.
+* **Next State:** The new, immutable state created after all mutations are applied to the draft.
+
+**How to Use Immer:**
+
+1.  **Installation:**
+    ```bash
+    npm install use-immer
+    ```
+2.  **Import and Use `useImmer`:**
+  * Replace `useState` with `useImmer`.
+  * Import `useImmer` from the `use-immer` library.
+3.  **Update State with the Setter Function:**
+  * The setter function provided by `useImmer` takes a callback function.
+  * Inside the callback, you can directly mutate the `draft` state.
+  * Immer will create a new immutable state based on the changes made to the draft.
+
+**Example: Updating Nested Objects:**
+
+```jsx
+import { useImmer } from "use-immer";
+
+function UserProfile() {
+  const [user, setUser] = useImmer({
+    name: "John",
+    age: 32,
+    address: {
+      country: "Singapore",
+      postalCode: 440004,
+    },
+  });
+
+  function handleUpdateCountry() {
+    setUser((draft) => {
+      draft.address.country = "Germany";
+    });
+  }
+
+  return (
+          <div>
+            <p>Name: {user.name}</p>
+            <p>Country: {user.address.country}</p>
+            <button onClick={handleUpdateCountry}>Update Country</button>
+          </div>
+  );
+}
+
+export default UserProfile;
+```
+
+## Benefits of Using Immer:
+
+* **Simplified State Updates:** Immer allows you to write mutable-looking code, while ensuring immutability behind the scenes.
+* **Reduced Boilerplate:** It eliminates the need for manual object and array copying, making your code cleaner and more concise.
+* **Improved Readability:** The mutation syntax is more intuitive, especially for complex nested objects.
+* **Performance Optimization:** Immer efficiently tracks changes, minimizing unnecessary re-renders.
+* **Deep Updates Made Easy:** very deep nested state changes are simplified.
+
+## Key Points:
+
+* Immer uses JavaScript proxies to efficiently track changes.
+* You directly mutate the `draft` state within the setter function's callback.
+* Immer automatically generates a new, immutable state.
+* Immer is very useful when dealing with complex state objects.
+
+
+
+
+
+
+# Callback Function in `setState()`
+
+The primary purpose of providing a callback function as the second argument to `setState()` is to execute code *after* the state has been updated and the component has re-rendered.
+
+**Why Use a Callback?**
+
+* **Asynchronous `setState()`:** `setState()` is asynchronous. This means that when you call it, the state update doesn't happen immediately. React batches state updates for performance reasons.
+* **Guaranteed Execution After Re-render:** The callback function is guaranteed to be executed after React has applied the state changes and re-rendered the component.
+* **Handling Side Effects:** It's useful for performing side effects that depend on the updated state, such as making API calls, manipulating the DOM, or logging values.
+
+**Example:**
+
+```jsx
+import React, { Component } from 'react';
+
+class Counter extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            count: 0,
+        };
+    }
+
+    increment = () => {
+        this.setState(
+            (prevState) => ({
+                count: prevState.count + 1,
+            }),
+            () => {
+                console.log('Count updated:', this.state.count);
+                // Perform other actions that depend on the updated count here.
+                // For example, an API call.
+                if(this.state.count === 5){
+                    console.log("Count is now 5!");
+                }
+            }
+        );
+    };
+
+    render() {
+        return (
+            <div>
+                <p>Count: {this.state.count}</p>
+                <button onClick={this.increment}>Increment</button>
+            </div>
+        );
+    }
+}
+
+export default Counter;
+```
+
+## Explanation:
+
+* **`increment()` Function:**
+    * When the "Increment" button is clicked, the `increment()` function is called.
+    * `this.setState()` is used to update the `count` state.
+    * The first argument to `setState()` is a function that receives the previous state and returns the new state. This
+      is the recommended way to update state based on previous state values.
+    * The second argument is the callback function.
+* **Callback Execution:**
+    * After React updates the `count` state and re-renders the component, the callback function is executed.
+    * Inside the callback, `console.log('Count updated:', this.state.count)` logs the updated count value.
+    * An if statement shows that other code can be ran, after the state has been updated.
+* **Why Not Just Use `console.log(this.state.count)` After `setState()`?**
+    * If you placed `console.log(this.state.count)` immediately after the `setState()` call, it would likely log the 
+      previous count value because `setState()` is asynchronous. The callback ensures that the log occurs after the
+      update.
+
+## Recommendation:
+
+* While callback functions are useful, React's lifecycle methods (e.g., `componentDidUpdate`) or the `useEffect` hook in
+  functional components are generally preferred for handling side effects that depend on state updates. They provide 
+  more structured and predictable ways to manage these actions.
+* Using callbacks directly in the `setState` function can lead to deeply nested callbacks, or "callback hell". Lifecycle
+  methods and `useEffect` reduce this problem.
+
+
+
+
 
 
 

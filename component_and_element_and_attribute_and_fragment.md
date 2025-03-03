@@ -359,6 +359,8 @@ An **Uncontrolled Component** is a component that manages its state by **DOM dir
 value via React state, you use a **ref** to directly access the DOM element and retrieve its value when needed. For 
 class component we can use `React.createRef()` and for functional component we can use `useRef()` hook.
 
+We can set default values to uncontrolled component using `defaultValue` attribute.
+
 ```jsx
 function UncontrolledInput() {
   const inputRef = React.useRef(null);
@@ -370,7 +372,7 @@ function UncontrolledInput() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <input type="text" ref={inputRef} />
+      <input type="text" ref={inputRef} defaultValue="Hello" />
       <button type="submit">Submit</button>
     </form>
   );
