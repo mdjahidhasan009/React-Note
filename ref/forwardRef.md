@@ -653,6 +653,125 @@ and have to be imperative anyway like Focus management or text selection in any 
 use forward API and you can switch to custom ref pattern to get all the benefits that we have described
 
 
+
+
+## Debugging `forwardRefs` in DevTools
+
+`React.forwardRef` accepts a render function as a parameter, and DevTools uses this function to determine what to display for the ref-forwarding component.
+
+For example, if you don't name the render function or are not using the `displayName` property, then it will appear as "ForwardRef" in the DevTools:
+
+```javascript
+const WrappedComponent = React.forwardRef((props, ref) => {
+  return <LogProps {...props} forwardedRef={ref} />;
+});
+```
+
+But if you name the render function, then it will appear as "ForwardRef(myFunction)":
+
+```javascript
+const WrappedComponent = React.forwardRef(function myFunction(props, ref) {
+  return <LogProps {...props} forwardedRef={ref} />;
+});
+```
+
+As an alternative, you can also set the `displayName` property for the `forwardRef` function:
+
+```javascript
+function logProps(Component) {
+  class LogProps extends React.Component {
+    // ...
+  }
+
+  function forwardRef(props, ref) {
+    return <LogProps {...props} forwardedRef={ref} />;
+  }
+
+  // Give this component a more helpful display name in DevTools.
+  // e.g. "ForwardRef(logProps(MyComponent))"
+  const name = Component.displayName || Component.name;
+  forwardRef.displayName = `logProps(${name})`;
+
+  return React.forwardRef(forwardRef);
+}
+```
+
+
+
+## Purpose of `forwardRef` in Higher-Order Components (HOCs)
+
+Refs will not get passed through because `ref` is not a prop. It is handled differently by React, just like `key`. If you add a ref to a HOC, the ref will refer to the outermost container component, not the wrapped component. In this case, you can use the Forward Ref API. For example, we can explicitly forward refs to the inner `FancyButton` component using the `React.forwardRef` API.
+
+The below HOC logs all props:
+
+```javascript
+function logProps(Component) {
+  class LogProps extends React.Component {
+    componentDidUpdate(prevProps) {
+      console.log("old props:", prevProps);
+      console.log("new props:", this.props);
+    }
+
+    render() {
+      const { forwardedRef, ...rest } = this.props;
+
+      // Assign the custom prop "forwardedRef" as a ref
+      return <Component ref={forwardedRef} {...rest} />;
+    }
+  }
+
+  return React.forwardRef((props, ref) => {
+    return <LogProps {...props} forwardedRef={ref} />;
+  });
+}
+```
+
+Let's use this HOC to log all props that get passed to our "fancy button" component:
+
+```javascript
+class FancyButton extends React.Component {
+  focus() {
+    // ...
+  }
+
+  // ...
+}
+export default logProps(FancyButton);
+```
+
+Now let's create a ref and pass it to the `FancyButton` component. In this case, you can set focus to the button element:
+
+```javascript
+import FancyButton from "./FancyButton";
+
+const ref = React.createRef();
+// Assuming FancyButton correctly forwards the ref to a DOM element
+// and that ref.current is not null or undefined after rendering.
+// This is just an example, and might not work depending on the 
+// exact implementation of FancyButton and its underlying DOM structure.
+// You need to wait for the component to mount before accessing the ref.
+// You would typically do this within a useEffect hook.
+
+// For example:
+// useEffect(() => {
+//   if (ref.current) {
+//     ref.current.focus();
+//   }
+// }, []);
+
+
+<FancyButton label="Click Me" handleClick={handleClick} ref={ref} />;
+```
+
+**Is the `ref` argument available for all functions or class components?**
+
+Regular function or class components don’t receive the `ref` argument, and `ref` is not available in props either. The second `ref` argument only exists when you define a component with a `React.forwardRef` call.
+
+**Why do you need additional care for component libraries while using forward refs?**
+
+When you start using `forwardRef` in a component library, you should treat it as a breaking change and release a new major version of your library. This is because your library likely has a different behavior, such as what refs get assigned to, and what types are exported. These changes can break apps and other libraries that depend on the old behavior.
+
+
 ### Source
 * [Goodbye, forwardRef](https://www.youtube.com/watch?v=m4QbeS9BTNU)
 * [Advanced React](https://www.advanced-react.com/)

@@ -76,6 +76,10 @@ componentWillUnmount() {
 }
 ```
 
+You should not call setState() in componentWillUnmount() because once a component instance is unmounted, it will never
+be mounted again.
+
+
 ## `shouldComponentUpdate`
 Called before the component updates. This method should return `true` if the component should update, or `false` if it
 should not. By default, this method returns `true`.
@@ -313,6 +317,13 @@ Order of methods in component class
 * getter methods for render like `getSelectReason()` or `getFooterContent()`
 * optional render methods like `renderNavigation()` or `renderProfilePicture()`
 * `render()`
+
+## Order when component  re-rendered
+* static getDerivedStateFromProps()
+* shouldComponentUpdate()
+* render()
+* getSnapshotBeforeUpdate()
+* componentDidUpdate()
 
 
 ### References

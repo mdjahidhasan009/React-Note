@@ -61,7 +61,7 @@ with `ReactDOMServer.renderToString()` and `ReactDOMServer.renderToStaticMarkup(
 
 ---
 
-## Why ReactDOM is separated from React?
+### Why ReactDOM is separated from React?
 
 The React team extracted all DOM-related features into a separate library called `ReactDOM`. React v0.14 was the first
 release where the libraries were split.
@@ -72,6 +72,19 @@ that the essence of React is not tied to browsers or the DOM.
 To support rendering in multiple environments, the React team split the main React package into two: `react` and
 `react-dom`. This allows developers to write components that can be shared between the web version of React and React
 Native.
+
+### Purpose of `ReactDOM.unmountComponentAtNode`
+
+This method is available from the `react-dom` package and it removes a mounted React component from the DOM and cleans 
+up its event handlers and state. If no component was mounted in the container, calling this function does nothing.
+Returns `true` if a component was unmounted and `false` if there was no component to unmount.
+
+The method signature would be as follows:
+
+```javascript
+ReactDOM.unmountComponentAtNode(container);
+```
+
 
 
 ## Get react version at runtime

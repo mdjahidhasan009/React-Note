@@ -728,6 +728,93 @@ functionality is not available in modern React.
 
 
 
+## State Updates are Merged in React
+
+When you call `setState()` in a component, React *merges* the object you provide into the current state. This means that you don't have to update the entire state object; you can update only the specific properties that have changed.
+
+For example, let's take a Facebook user with posts and comments details as state variables:
+
+```javascript
+constructor(props) {
+  super(props);
+  this.state = {
+    posts: [],
+    comments: []
+  };
+}
+```
+
+Now you can update them independently with separate `setState()` calls as below:
+
+```javascript
+componentDidMount() {
+  fetchPosts().then(response => {
+    this.setState({
+      posts: response.posts
+    });
+  });
+
+  fetchComments().then(response => {
+    this.setState({
+      comments: response.comments
+    });
+  });
+}
+```
+
+As mentioned in the above code snippets, `this.setState({ comments: response.comments })` updates only the `comments` variable without modifying or replacing the `posts` variable.
+
+**Final State (after both `setState` calls complete):**
+
+```javascript
+this.state = {
+  posts: responseFromFetchPosts.posts, // Values fetched from fetchPosts()
+  comments: responseFromFetchComments.comments // Values fetched from fetchComments()
+};
+```
+
+The `posts` property retains its original value (from the `fetchPosts()` call) while the `comments` property is updated with the new value (from the `fetchComments()` call).  This merging behavior is fundamental to how React manages and updates component state efficiently.
+
+
+
+
+
+## State Mutation and How to Prevent It
+
+State mutation happens when you try to update the state of a component without actually using the `setState` function. This can happen when you are trying to do some computations using a state variable and unknowingly save the result in the same state variable. This is the main reason why it is advised to return new instances of state variables from reducers by using `Object.assign({}, ...)` or the spread syntax.
+
+This can cause unknown issues in the UI as the value of the state variable got updated without telling React to check what all components were being affected from this update, and it can cause UI bugs.
+
+**Example:**
+
+```javascript
+class A extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      loading: false
+    }
+ }
+
+componentDidMount() {
+  let { loading } = this.state;
+  loading = (() => true)(); // Trying to perform an operation and directly saving in a state variable
+}
+```
+
+**How to Prevent It:**
+
+Make sure your state variables are immutable by either:
+
+*   Enforcing immutability by using plugins like Immutable.js.
+*   Always using `setState` to make updates.
+*   Returning new instances in reducers when sending updated state values.
+
+
+
+
+
+
 # reselect
 Reselect is a selector library (for Redux) which uses memoization concept. It was originally written to compute derived
 data from Redux-like applications state, but it can't be tied to any architecture or library.

@@ -28,10 +28,11 @@ class Greeting extends React.Component {
 * Can have lifecycle methods (e.g., `componentDidMount`, `useEffect`).
 
 
-## Class Component vs Function Component
+## Class Component vs Function Component 
 After react 16.8, we can use hooks in function component to use state and lifecycle methods. So, we can use function
 component instead of class component. 
 
+### Error Boundary
 But only in class component we can use `Error Boundaries` to catch error in child component native way. 
 ```js
 class ErrorBoundary extends React.Component {
@@ -40,10 +41,13 @@ class ErrorBoundary extends React.Component {
         this.state = { hasError: false };
     }
     
+    // only available in class component 
     static getDerivedStateFromError(error) {
         // Update state so the next render will show the fallback UI.
         return { hasError: true };
     }
+  
+    // only available in class component
     componentDidCatch(error, info) {
         // Example "componentStack":
         // in ComponentThatThrows (created by App)
@@ -117,6 +121,61 @@ The error is located at:             in BuggyCounter (at App.js:26)
                                      in div (at App.js:8)
                                      in App (at index.js:5)
 ```
+
+
+### Try-Catch Blocks vs. Error Boundaries in React
+
+The key difference between `try...catch` blocks and Error Boundaries in React lies in the type of code they handle:
+
+*   **`try...catch`:** Handles *imperative* code.
+*   **Error Boundaries:** Handle *declarative* code (rendering).
+
+**`try...catch` Blocks:**
+
+`try...catch` blocks are a standard JavaScript construct for handling errors in synchronous, imperative code.
+
+```javascript
+try {
+  showButton(); // Imperative code that might throw an error
+} catch (error) {
+  // Handle the error
+}
+```
+
+In this example, if the `showButton()` function throws an error, the `catch` block will execute, allowing you to handle the error (e.g., log it, display an error message, etc.). `try...catch` blocks only catch errors that happen within the `try` block in a synchronous manner.
+
+**Error Boundaries:**
+
+Error Boundaries are React components that catch JavaScript errors anywhere in their child component tree, log those errors, and display a fallback UI instead of the component tree that crashed. Error Boundaries catch errors during rendering, in lifecycle methods, and in constructors of the whole tree below them.
+
+```javascript
+<ErrorBoundary>
+  <MyComponent /> {/* Declarative component that might throw an error during render */}
+</ErrorBoundary>
+```
+
+If `MyComponent` or any of its children throw an error during rendering, the `ErrorBoundary` will catch the error and render a fallback UI.
+
+**Key Differences & Why Error Boundaries are Important in React:**
+
+1.  **Error Scope:** `try...catch` only works for direct, synchronous code within the `try` block. It won't catch errors in asynchronous code, event handlers, or React lifecycle methods. Error Boundaries, on the other hand, catch errors during rendering and lifecycle events within the entire subtree they wrap.
+
+2.  **Declarative vs. Imperative:** React is declarative. You describe *what* you want to render, and React handles the *how*. Error Boundaries are designed to handle errors that arise during the declarative rendering process.
+
+3.  **Asynchronous Errors:** If an error occurs in a `componentDidUpdate` method (often triggered by a `setState` call), the error might propagate asynchronously. A `try...catch` block in the component's `render` method wouldn't catch this, but the error will correctly propagate to the closest error boundary.
+
+4.  **Granular Error Handling:** Error Boundaries allow you to isolate and handle errors in specific parts of your application, providing a more graceful user experience. If a component crashes, the rest of the application can continue to function.
+
+**Limitations of Error Boundaries:**
+
+*   **Not for Event Handlers:** Error Boundaries do *not* catch errors inside event handlers. You still need to use `try...catch` blocks within event handlers.
+*   **Server-Side Rendering:** Error Boundaries don't work during server-side rendering.
+*   **JavaScript Errors Only:** They catch JavaScript errors, not React-specific warnings or issues.
+
+In summary, `try...catch` blocks are for handling errors in imperative JavaScript code, while Error Boundaries are a React-specific feature designed to gracefully handle errors that occur during the declarative rendering process and lifecycle methods of React components. They allow you to provide a fallback UI and prevent the entire application from crashing.
+
+
+
 
 
 # Naming a component

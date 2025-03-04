@@ -20,9 +20,11 @@ It includes everything we need to build a React app:
 * React, JSX, ES6, and Flow syntax support.
 * Language extras beyond ES6 like the object spread operator.
 * Autoprefixed CSS, so you don’t need -webkit- or other prefixes.
+* CSS Reset/Normalize
 * A fast interactive unit test runner with built-in support for coverage reporting.
 * A live development server that warns about common mistakes.
 * A build script to bundle JS, CSS, and images for production, with hashes and sourcemaps.
+* An offline-first service worker and a web app manifest, meeting all the Progressive Web App criteria.
 
 
 

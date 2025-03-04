@@ -558,5 +558,196 @@ export default EnhancedComponent;
 In this example, `withRenderHijack` is a Higher-Order Component that wraps `SimpleComponent` and injects an additional
 prop, modifying its behavior dynamically.
 
+
+
+
+
+## Higher-Order Component (HOC) Factory Implementations in React
+
+Higher-Order Components (HOCs) are a powerful pattern in React for code reuse and logic abstraction.  They are functions that take a component and return a new, enhanced component.  There are two primary implementation strategies: Props Proxy (PP) and Inheritance Inversion (II). Each approach offers different capabilities and trade-offs.
+
+**1. Props Proxy (PP)**
+
+*   **Concept:**  The HOC renders a *React element* of the type of the wrapped component (`WrappedComponent`).  It acts as a proxy, intercepting and potentially modifying the props passed to the `WrappedComponent`.
+
+*   **Implementation:**
+
+    ```javascript
+    function ppHOC(WrappedComponent) {
+      return class PP extends React.Component {
+        render() {
+          // Pass all props received by the HOC to the WrappedComponent
+          return <WrappedComponent {...this.props} />;
+        }
+      };
+    }
+    ```
+
+*   **Explanation:**
+    *   `ppHOC` is a function that accepts a `WrappedComponent` as an argument.
+    *   It returns a new React component class, `PP`.
+    *   Inside the `PP` component's `render` method, it renders an instance of the `WrappedComponent`. Critically, it spreads all the props received by the `PP` component (the HOC) onto the `WrappedComponent`.
+    *   This allows the HOC to:
+        *   Modify existing props before passing them down.
+        *   Add new props to the `WrappedComponent`.
+        *   Conditionally render the `WrappedComponent`.
+        *   Access the `WrappedComponent`'s instance via `refs`. (Though refs should be used sparingly).
+
+*   **Advantages of Props Proxy:**
+
+    *   **Simple and Common:** Relatively straightforward to understand and implement.
+    *   **Prop Manipulation:** Provides excellent control over props passed to the wrapped component.  The HOC can add, modify, or remove props.
+    *   **Conditional Rendering:** The HOC can decide whether or not to render the wrapped component based on certain conditions.
+    *   **Access to Instance via Refs (Use Sparingly):** While generally discouraged, the HOC *can* obtain a ref to the wrapped component instance (use `React.forwardRef` to pass refs correctly) for advanced use cases, but relying on refs usually indicates a design smell.
+
+*   **Disadvantages of Props Proxy:**
+
+    *   **Name Collisions:**  Potential for prop name collisions between the HOC and the `WrappedComponent`. (Mitigated by careful naming conventions).
+    *   **No Access to State:** It cannot directly access the state of `WrappedComponent`.
+    *  **Wrapped component is always re-rendered even when the HOC does not need to pass any new props. This might lead to performance inefficiencies.**
+
+**2. Inheritance Inversion (II)**
+
+*   **Concept:**  The HOC *extends* the `WrappedComponent`. This creates an inheritance relationship where the HOC becomes a subclass of the `WrappedComponent`.  The control is *inverted* because the enhancer gains control over the wrapped component.
+
+*   **Implementation:**
+
+    ```javascript
+    function iiHOC(WrappedComponent) {
+      return class Enhancer extends WrappedComponent {
+        render() {
+          // Call the WrappedComponent's render method using super
+          return super.render();
+        }
+      };
+    }
+    ```
+
+*   **Explanation:**
+    *   `iiHOC` is a function that accepts a `WrappedComponent`.
+    *   It returns a new component class, `Enhancer`, which *extends* the `WrappedComponent`.
+    *   The `Enhancer`'s `render` method calls `super.render()`, which executes the `WrappedComponent`'s original `render` method.
+
+*   **Advantages of Inheritance Inversion:**
+
+    *   **Access to State:** The HOC has access to the state and lifecycle methods of the `WrappedComponent` (though modifying these is generally discouraged).
+    *   **Can Manipulate `render` output:**The HOC can modify the output of the `WrappedComponent`'s render method (e.g., by wrapping it in additional elements).
+    *   **Name Collisions:** Less prone to prop name collisions because the HOC isn't passing props directly; it's inheriting them.
+    *   **Can implement conditional rendering without re-rendering the wrapped component.**
+
+*   **Disadvantages of Inheritance Inversion:**
+
+    *   **Less Control over Props:**  The HOC doesn't have direct control over the props passed to the `WrappedComponent` in the same way as Props Proxy.  It primarily relies on the `WrappedComponent` using `this.props`.
+    *   **Tight Coupling:** Creates a tighter coupling between the HOC and the `WrappedComponent` due to the inheritance relationship, making it harder to reuse the HOC with different components.  It's more likely to break if the `WrappedComponent`'s internal implementation changes.
+    *   **Potential for Side Effects:**  Directly manipulating the `WrappedComponent`'s state or lifecycle methods can lead to unexpected side effects and make the code harder to reason about.  This is generally considered an anti-pattern.
+    *   **Breaks Static Methods**: Static methods on the wrapped component are not automatically available on the enhanced component. Need to be copied over manually.
+
+**Choosing Between Props Proxy and Inheritance Inversion:**
+
+*   **Props Proxy:** Generally preferred for most HOC use cases due to its simplicity, flexibility in prop manipulation, and looser coupling. Use it when you need to control the props passed to the wrapped component, conditionally render it, or add additional behavior without deeply affecting its internal workings.
+
+*   **Inheritance Inversion:**  Considered less common and should be used sparingly.  It's best suited for very specific scenarios where you absolutely need access to the `WrappedComponent`'s state or lifecycle methods and are aware of the potential drawbacks of tighter coupling and potential side effects.  Often, there are alternative approaches to achieve the desired result without resorting to II.  Using composition or render props is usually a better approach.
+
+**Important Considerations for both approaches:**
+
+*   **Display Name:**  Set the `displayName` of the HOC for better debugging in React DevTools.  For example:
+
+    ```javascript
+    function ppHOC(WrappedComponent) {
+      const wrapperName = WrappedComponent.displayName || WrappedComponent.name || 'Component';
+      class PP extends React.Component {
+        static displayName = `ppHOC(${wrapperName})`;
+        render() {
+          return <WrappedComponent {...this.props} />;
+        }
+      };
+      return PP;
+    }
+    ```
+
+*   **Static Methods:**  Static methods on the `WrappedComponent` are *not* automatically copied over to the enhanced component.  You'll need to manually copy them if you need them. Libraries like `hoist-non-react-statics` can assist with this, but be mindful of which statics you are copying.
+
+In summary, Props Proxy and Inheritance Inversion represent different approaches to HOC implementation, each with its own set of advantages and disadvantages. Props Proxy is generally the more versatile and preferred choice for most scenarios, while Inheritance Inversion should be reserved for specific cases where access to the wrapped component's state or lifecycle methods is essential.  Always consider the potential trade-offs and strive for the simplest and most maintainable solution.
+
+
+
+## Limitations of Higher-Order Components (HOCs)
+
+Higher-order components come with a few caveats apart from their benefits. Below are a few listed in order:
+
+* **Don’t use HOCs inside the render method:** It is not recommended to apply a HOC to a component within the render
+  method of a component.
+
+    ```javascript
+    render() {
+      // A new version of EnhancedComponent is created on every render
+      // EnhancedComponent1 !== EnhancedComponent2
+      const EnhancedComponent = enhance(MyComponent);
+      // That causes the entire subtree to unmount/remount each time!
+      return <EnhancedComponent />;
+    }
+    ```
+
+    The above code impacts performance by remounting a component that causes the state of that component and all of its
+    children to be lost. Instead, apply HOCs outside the component definition so that the resulting component is created
+    only once.
+
+*   **Static methods must be copied over:** When you apply a HOC to a component, the new component does not have any of 
+  the static methods of the original component.
+
+    ```javascript
+    // Define a static method
+    WrappedComponent.staticMethod = function () {
+      /*...*/
+    };
+    // Now apply a HOC
+    const EnhancedComponent = enhance(WrappedComponent);
+
+    // The enhanced component has no static method
+    typeof EnhancedComponent.staticMethod === "undefined"; // true
+    ```
+
+    You can overcome this by copying the methods onto the container before returning it:
+
+    ```javascript
+    function enhance(WrappedComponent) {
+      class Enhance extends React.Component {
+        /*...*/
+      }
+      // Must know exactly which method(s) to copy :(
+      Enhance.staticMethod = WrappedComponent.staticMethod;
+      return Enhance;
+    }
+    ```
+
+*   **Refs aren’t passed through:** For HOCs, you need to pass through all props to the wrapped component, but this does not work for refs. This is because `ref` is not really a prop, similar to `key`. In this case, you need to use the `React.forwardRef` API.
+
+
+
+
+
+## Creating HOCs Using Render Props
+
+You can implement most higher-order components (HOC) using a regular component with a render prop. For example, if you would prefer to have a `withMouse` HOC instead of a component, you could easily create one using a regular component with a render prop.
+
+```javascript
+function withMouse(Component) {
+  return class extends React.Component {
+    render() {
+      return (
+        <Mouse
+          render={(mouse) => <Component {...this.props} mouse={mouse} />}
+        />
+      );
+    }
+  };
+}
+```
+
+This way, render props gives the flexibility of using either pattern.
+
+
+
 ### Source:
 * [Advanced React](https://www.advanced-react.com/)
+* [reactjs-interview-questions - github](https://github.com/sudheerj/reactjs-interview-questions?tab=readme-ov-file#what-is-react)
